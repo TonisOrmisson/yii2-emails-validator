@@ -30,7 +30,7 @@ class EmailsValidationForm extends Model
     {
         return [
             [['textInput'], 'required'],
-            [['sutextInputbject'], 'string', 'max' => 1024 * 1024 * $this->module->maxInputMB],
+            [['textInput'], 'string', 'max' => 1024 * $this->module->maxInputKB],
         ];
     }
 
