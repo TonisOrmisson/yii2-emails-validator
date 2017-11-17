@@ -1,9 +1,13 @@
 <?php
 
 use andmemasin\emailsvalidator\models\EmailsValidationForm;
+use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var EmailsValidationForm $model */
+/* @var \yii\data\ArrayDataProvider $dataProvider */
+
+
 
 ?>
 <?php if($model->emailAddresses):?>
@@ -11,9 +15,16 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
         <div class="panel-heading"><?= Yii::t('app','Results')?></div>
 
         <div class="panel-body">
-            <?php foreach ($model->emailAddresses as $i=> $address):?>
-                <?= $this->render('_validate-address',['address'])?>
-            <?php endforeach;?>
+            <?= \yii\grid\GridView::widget([
+                'dataProvider' => $dataProvider,
+                'columns' => [
+                    ['class' => 'yii\grid\SerialColumn'],
+
+                    'address',
+                    'isValid:boolean',
+                    'error',
+                ],
+            ]); ?>
 
         </div>
     </div>

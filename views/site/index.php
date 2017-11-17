@@ -6,10 +6,10 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var EmailsValidationForm $model */
+/* @var \yii\data\ArrayDataProvider $dataProvider */
 
 $this->title = Yii::t('app', 'Bulk e-mail validation');
 $this->params['breadcrumbs'][] = Yii::t('app', 'E-mail validation');
-
 ?>
 <div id="bulk-email-validation">
     <?php $form = ActiveForm::begin() ?>
@@ -21,5 +21,5 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'E-mail validation');
 
     <?php $form = ActiveForm::end() ?>
 
-    <?= $this->render('_validation-list',['model'=>$model])?>
+    <?= $this->render('_validation-list',['model'=>$model,'dataProvider'=>$dataProvider])?>
 </div>

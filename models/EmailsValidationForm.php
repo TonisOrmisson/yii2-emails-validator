@@ -15,7 +15,7 @@ class EmailsValidationForm extends Model
     /** @var  Module */
     public $module;
 
-    /** @var  string[] $emailAddresses */
+    /** @var  EmailAddress[] $emailAddresses */
     public $emailAddresses;
 
     /** @inheritdoc */
@@ -61,7 +61,12 @@ class EmailsValidationForm extends Model
             $array = preg_split( $pattern, $this->textInput );
             if(!empty($array)){
                 foreach ($array as $address){
-                    $this->emailAddresses[] = $address;
+                    if($address){
+                        $model = new EmailAddress(['address'=>$address]);
+
+                        $this->emailAddresses[] = $model;
+
+                    }
                 }
             }
         }
