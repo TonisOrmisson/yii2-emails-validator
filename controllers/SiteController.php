@@ -2,6 +2,7 @@
 
 namespace andmemasin\emailsvalidator\controllers;
 
+use andmemasin\emailsvalidator\models\EmailsValidationForm;
 use andmemasin\emailsvalidator\Module;
 use Yii;
 use yii\web\Controller;
@@ -40,8 +41,10 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        $model = new EmailsValidationForm();
 
         return $this->render('index', [
+            'model'=>$model,
         ]);
     }
 

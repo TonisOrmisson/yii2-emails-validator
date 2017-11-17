@@ -8,6 +8,7 @@ use yii;
 
 class EmailsValidationForm extends Model
 {
+    //TODO find me a better name!
     /** @var  string */
     public $textInput;
 
