@@ -1,0 +1,17 @@
+language: php
+sudo: false
+dist: trusty
+php:
+    - 7.0
+    - 7.1
+    - 5.6
+before_script:
+    # disable xdebug to speed up tests
+    - phpenv config-rm xdebug.ini
+    # Install LimeSurvey.
+    - phpunit --version
+    - unzip chromedriver_linux64.zip
+
+script:
+    # install clean yii2-basic
+    - php composer.phar create-project --prefer-dist --stability=dev yiisoft/yii2-app-basic basic
