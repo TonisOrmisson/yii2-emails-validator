@@ -1,5 +1,6 @@
 <?php
 
+use andmemasin\emailsvalidator\models\EmailAddress;
 use andmemasin\emailsvalidator\models\EmailsValidationForm;
 use yii\widgets\Pjax;
 
@@ -21,10 +22,38 @@ use yii\widgets\Pjax;
                     ['class' => 'yii\grid\SerialColumn'],
 
                     'address',
-                    'isValidRFC:boolean',
-                    'isNoRFCWarnings:boolean',
-                    'isValidDNS:boolean',
-                    'isValidSpoofCheck:boolean',
+                    [
+                        'attribute'=> 'isValidRFC',
+                        'format'=>'boolean',
+                        'contentOptions' => function ($model) {
+                            /** @var EmailAddress $model */
+                            return ['class' => ($model->isValidRFC ? 'success' : 'danger')];
+                        },
+                    ],
+                    [
+                        'attribute'=> 'isNoRFCWarnings',
+                        'format'=>'boolean',
+                        'contentOptions' => function ($model) {
+                            /** @var EmailAddress $model */
+                            return ['class' => ($model->isNoRFCWarnings ? 'success' : 'danger')];
+                        },
+                    ],
+                    [
+                        'attribute'=> 'isValidDNS',
+                        'format'=>'boolean',
+                        'contentOptions' => function ($model) {
+                            /** @var EmailAddress $model */
+                            return ['class' => ($model->isValidDNS ? 'success' : 'danger')];
+                        },
+                    ],
+                    [
+                        'attribute'=> 'isValidSpoofCheck',
+                        'format'=>'boolean',
+                        'contentOptions' => function ($model) {
+                            /** @var EmailAddress $model */
+                            return ['class' => ($model->isValidSpoofCheck ? 'success' : 'danger')];
+                        },
+                    ],
                 ],
             ]); ?>
 

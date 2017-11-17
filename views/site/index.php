@@ -12,11 +12,19 @@ $this->title = Yii::t('app', 'Bulk e-mail validation');
 $this->params['breadcrumbs'][] = Yii::t('app', 'E-mail validation');
 ?>
 <div id="bulk-email-validation">
-    <?php $form = ActiveForm::begin() ?>
-    <?= $form->field($model, 'textInput')->textarea(); ?>
+    <div class="panel panel-default email-validation-results" id="email-validation-results">
+        <div class="panel-heading"><?= Yii::t('app','Input')?></div>
 
-    <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Validate'), ['class' => 'btn btn-primary']) ?>
+        <div class="panel-body">
+            <?php $form = ActiveForm::begin() ?>
+            <?= $form->field($model, 'textInput')->textarea(['rows'=>10]); ?>
+
+            <div class="form-group">
+                <?= Html::submitButton(Yii::t('app', 'Validate'), ['class' => 'btn btn-primary']) ?>
+            </div>
+        </div>
+
+        </div>
     </div>
 
     <?php $form = ActiveForm::end() ?>
