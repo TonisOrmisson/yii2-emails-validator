@@ -8,9 +8,6 @@ php:
 before_script:
     # disable xdebug to speed up tests
     - phpenv config-rm xdebug.ini
-    # Install LimeSurvey.
-    - phpunit --version
-    - unzip chromedriver_linux64.zip
 
 script:
     # install clean yii2-basic
