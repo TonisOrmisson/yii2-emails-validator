@@ -21,4 +21,5 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'E-mail validation');
 
     <?php $form = ActiveForm::end() ?>
 
+    <?= $this->render('_validation-list',['model'=>$model])?>
 </div>
