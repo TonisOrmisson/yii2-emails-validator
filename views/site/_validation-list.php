@@ -20,13 +20,27 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
                 'columns' => [
                     ['class' => 'yii\grid\SerialColumn'],
 
-                    'address',
+                    [
+                        'attribute'=> 'address',
+                        'contentOptions' => function ($model) {
+                            /** @var EmailAddress $model */
+                            return ['class' => (!$model->isValid ? 'danger': null)];
+                        },
+                    ],
+                    [
+                        'attribute'=> 'isValid',
+                        'format'=>'boolean',
+                        'contentOptions' => function ($model) {
+                            /** @var EmailAddress $model */
+                            return ['class' => (!$model->isValid ? 'danger': null)];
+                        },
+                    ],
                     [
                         'attribute'=> 'isValidRFC',
                         'format'=>'boolean',
                         'contentOptions' => function ($model) {
                             /** @var EmailAddress $model */
-                            return ['class' => ($model->isValidRFC ? 'success' : 'danger')];
+                            return ['class' => (!$model->isValidRFC ? 'danger': null)];
                         },
                     ],
                     [
@@ -34,7 +48,7 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
                         'format'=>'boolean',
                         'contentOptions' => function ($model) {
                             /** @var EmailAddress $model */
-                            return ['class' => ($model->isNoRFCWarnings ? 'success' : 'danger')];
+                            return ['class' => (!$model->isNoRFCWarnings ? 'danger': null)];
                         },
                     ],
                     [
@@ -42,7 +56,7 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
                         'format'=>'boolean',
                         'contentOptions' => function ($model) {
                             /** @var EmailAddress $model */
-                            return ['class' => ($model->isValidDNS ? 'success' : 'danger')];
+                            return ['class' => (!$model->isValidDNS ? 'danger': null)];
                         },
                     ],
                     [
@@ -50,7 +64,7 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
                         'format'=>'boolean',
                         'contentOptions' => function ($model) {
                             /** @var EmailAddress $model */
-                            return ['class' => ($model->isValidSpoofCheck ? 'success' : 'danger')];
+                            return ['class' => (!$model->isValidSpoofCheck ? 'danger': null)];
                         },
                     ],
                 ],

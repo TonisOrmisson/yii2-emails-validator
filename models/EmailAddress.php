@@ -62,6 +62,8 @@ class EmailAddress extends Model
         $this->isNoRFCWarnings = $this->validator->isValid($this->address, new NoRFCWarningsValidation());
         $this->isValidDNS = $this->validator->isValid($this->address, new DNSCheckValidation());
         $this->isValidSpoofCheck = $this->validator->isValid($this->address, new SpoofCheckValidation());
+
+        $this->isValid = ($this->isValidRFC && $this->isNoRFCWarnings && $this->isValidDNS && $this->isValidSpoofCheck );
     }
 
 }
