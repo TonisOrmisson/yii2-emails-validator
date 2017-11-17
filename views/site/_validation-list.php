@@ -21,8 +21,10 @@ use yii\widgets\Pjax;
                     ['class' => 'yii\grid\SerialColumn'],
 
                     'address',
-                    'isValid:boolean',
-                    'error',
+                    'isValidRFC:boolean',
+                    'isNoRFCWarnings:boolean',
+                    'isValidDNS:boolean',
+                    'isValidSpoofCheck:boolean',
                 ],
             ]); ?>
 

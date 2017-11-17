@@ -57,7 +57,6 @@ class SiteController extends Controller
                 ],
             ]);
         }
-        echo count($model->emailAddresses);
         return $this->render('index', [
             'model'=>$model,
             'dataProvider'=>$dataProvider,

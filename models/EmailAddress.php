@@ -10,6 +10,8 @@ namespace andmemasin\emailsvalidator\models;
 
 
 use Egulias\EmailValidator\EmailValidator;
+use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
+use Egulias\EmailValidator\Validation\SpoofCheckValidation;
 use yii\base\Model;
 use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
 use Egulias\EmailValidator\Validation\RFCValidation;
@@ -29,6 +31,17 @@ class EmailAddress extends Model
     /** @var boolean */
     public $isValid = false;
 
+    /** @var boolean */
+    public $isValidRFC = false;
+
+    /** @var boolean */
+    public $isNoRFCWarnings = false;
+
+    /** @var boolean */
+    public $isValidDNS = false;
+
+    /** @var boolean */
+    public $isValidSpoofCheck = false;
 
     /** @var string $error */
     public $error;
@@ -40,20 +53,15 @@ class EmailAddress extends Model
     {
         parent::init();
         $this->validator = new EmailValidator();
-        $this->additionalValidationMethods = new MultipleValidationWithAnd([
-            new RFCValidation(),
-            new DNSCheckValidation()
-        ]);
 
         $this->runValidator();
     }
 
     private function runValidator(){
-        $this->isValid = $this->validator->isValid($this->address);
-        if($this->validator->getError()){
-            $this->error = $this->validator->getError()->getMessage();
-        }
-
+        $this->isValidRFC = $this->validator->isValid($this->address, new RFCValidation());
+        $this->isNoRFCWarnings = $this->validator->isValid($this->address, new NoRFCWarningsValidation());
+        $this->isValidDNS = $this->validator->isValid($this->address, new DNSCheckValidation());
+        $this->isValidSpoofCheck = $this->validator->isValid($this->address, new SpoofCheckValidation());
     }
 
 }
