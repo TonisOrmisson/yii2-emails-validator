@@ -1,5 +1,4 @@
 # yii2-emails-validator
 A Yii2 module to do bulk e-mails validation
-dsfds
-sdf
-sdf
+[![Build Status](https://travis-ci.org/TonisOrmisson/yii2-emails-validator.svg)](https://travis-ci.org/TonisOrmisson/yii2-emails-validator/)
+
