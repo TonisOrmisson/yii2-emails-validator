@@ -5,6 +5,7 @@ namespace andmemasin\emailsvalidator\models;
 use andmemasin\emailsvalidator\Module;
 use yii\base\Model;
 use yii;
+use yii\helpers\StringHelper;
 
 class EmailsValidationForm extends Model
 {
@@ -14,6 +15,9 @@ class EmailsValidationForm extends Model
 
     /** @var  Module */
     public $module;
+
+    /** @var  EmailAddress[] $emailAddresses */
+    private $emailAddresses;
 
     /** @inheritdoc */
     public function init()
@@ -45,6 +49,25 @@ class EmailsValidationForm extends Model
         return [
             'textInput'=>Yii::t('app','The addresses can be delimited by line breaks, commas or semi-colons'),
         ];
+    }
+
+    public function process(){
+        $this->loadEmailAddresses();
+
+        return true;
+    }
+
+    private function loadEmailAddresses(){
+        if($this->textInput){
+            $pattern = '/\r\n|[\r\n]/';
+            $array = preg_split( $pattern, $this->textInput );
+            if(!empty($array)){
+                foreach ($array as $address){
+                    $this->emailAddresses[] = new EmailAddress(['address'=>$address]);
+                }
+            }
+        }
+
     }
 
 }

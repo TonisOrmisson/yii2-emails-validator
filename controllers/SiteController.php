@@ -43,6 +43,10 @@ class SiteController extends Controller
     {
         $model = new EmailsValidationForm();
 
+        if($model->load(Yii::$app->request->post()) && $model->process()){
+
+        }
+
         return $this->render('index', [
             'model'=>$model,
         ]);
