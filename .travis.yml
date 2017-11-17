@@ -3,7 +3,6 @@ sudo: false
 dist: trusty
 php:
     - 7.0
-    - 7.1
     - 5.6
 before_script:
     # disable xdebug to speed up tests
@@ -11,4 +10,4 @@ before_script:
 
 script:
     # install clean yii2-basic
-    - php composer.phar create-project --prefer-dist --stability=dev yiisoft/yii2-app-basic basic
+    - composer create-project --prefer-dist --stability=dev yiisoft/yii2-app-basic basic
