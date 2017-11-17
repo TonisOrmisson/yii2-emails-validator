@@ -2,7 +2,6 @@
 
 use andmemasin\emailsvalidator\models\EmailAddress;
 use andmemasin\emailsvalidator\models\EmailsValidationForm;
-use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var EmailsValidationForm $model */
