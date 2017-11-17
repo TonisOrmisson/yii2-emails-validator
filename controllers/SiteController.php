@@ -18,7 +18,6 @@ class SiteController extends Controller
         parent::init();
     }
 
-
     public function behaviors()
     {
         return [

@@ -17,4 +17,7 @@ class Module extends \yii\base\Module
     /** @inheritdoc  */
     public $defaultRoute = 'site/index';
 
+    /** @var int $maxInputMB Limit the input string to MB (default = 1) */
+    public $maxInputMB = 1;
+
 }
