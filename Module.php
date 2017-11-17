@@ -14,5 +14,7 @@ class Module extends \yii\base\Module
      */
     public $controllerNamespace = 'andmemasin\emailsvalidator\controllers';
 
+    /** @inheritdoc  */
+    public $defaultRoute = 'site/index';
 
 }
