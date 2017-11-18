@@ -3,6 +3,8 @@
 use andmemasin\emailsvalidator\models\EmailsValidationForm;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
+use yii;
+use yii\bootstrap\Alert;
 
 /* @var $this yii\web\View */
 /* @var EmailsValidationForm $model */
@@ -12,6 +14,22 @@ $this->title = Yii::t('app', 'Bulk e-mail validation');
 $this->params['breadcrumbs'][] = Yii::t('app', 'E-mail validation');
 ?>
 <div id="bulk-email-validation">
+    <?php if($model->module->displayFlashMessages):?>
+    <div class="row">
+        <div class="col-xs-12">
+            <?php foreach (Yii::$app->session->allFlashes as $type => $message): ?>
+                <?php if (in_array($type, ['success', 'danger', 'warning', 'info'])): ?>
+                    <?= Alert::widget([
+                        'options' => ['class' => 'alert-dismissible alert-' . $type],
+                        'body' => $message
+                    ]) ?>
+                <?php endif ?>
+            <?php endforeach ?>
+        </div>
+    </div>
+    <?php endif;?>
+
+
     <div class="panel panel-default email-validation-results" id="email-validation-results">
         <div class="panel-heading"><?= Yii::t('app','Input')?></div>
 
