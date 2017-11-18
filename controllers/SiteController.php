@@ -58,7 +58,9 @@ class SiteController extends Controller
                 ],
             ]);
             $formatter = new Formatter();
-            Yii::$app->session->addFlash('success',Yii::t('app','Check complete in {0}!',[$formatter->asDuration(Yii::getLogger()->getElapsedTime())]));
+            Yii::$app->session->addFlash('success',Yii::t('app','Checked {count} e-mails in {duration}!',[
+                'count'=>count($model->emailAddresses),
+                'duration'=>$formatter->asDuration(Yii::getLogger()->getElapsedTime())]));
         }
         return $this->render('index', [
             'model'=>$model,

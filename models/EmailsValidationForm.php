@@ -59,6 +59,7 @@ class EmailsValidationForm extends Model
     {
         return [
             'textInput'=>Yii::t('app','One e-mail address per line'),
+            'checkDNS'=>Yii::t('app','Checking DNS will increase processing time'),
         ];
     }
 
