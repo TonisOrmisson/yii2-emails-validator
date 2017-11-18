@@ -9,8 +9,7 @@ use Egulias\EmailValidator\Validation\SpoofCheckValidation;
 use yii\base\Model;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use Egulias\EmailValidator\Validation\DNSCheckValidation;
-use yii\helpers\StringHelper;
-
+use yii;
 
 /**
  * Class EmailAddress
@@ -46,7 +45,6 @@ class EmailAddress extends Model
     /** @var string $error */
     public $error;
 
-
     public function init()
     {
         parent::init();
@@ -55,13 +53,31 @@ class EmailAddress extends Model
         $this->runValidator();
     }
 
+    public function attributeLabels()
+    {
+        return [
+            'address'=>Yii::t('app','E-mail address'),
+            'isValid'=>Yii::t('app','Is valid?'),
+            'isValidRFC'=>Yii::t('app','In line with RFC standard?'),
+            'isNoRFCWarnings'=>Yii::t('app','Any RFC warnings?'),
+            'isValidDNS'=>Yii::t('app','DNS check passed?'),
+            'needsTrimming'=>Yii::t('app','Has spaces to be trimmed?'),
+            'isValidSpoofCheck'=>Yii::t('app','Spoof check OK?'),
+
+        ];
+    }
+
+
+    /**
+     * run the different validators
+     * @return void
+     */
     private function runValidator(){
-
-
         $this->isValidRFC = $this->validator->isValid($this->address, new RFCValidation());
         $this->isNoRFCWarnings = $this->validator->isValid($this->address, new NoRFCWarningsValidation());
         $this->isValidDNS = $this->validator->isValid($this->address, new DNSCheckValidation());
         $this->isValidSpoofCheck = $this->validator->isValid($this->address, new SpoofCheckValidation());
+
         $this->setNeedsTrimming();
         $this->isValid = ($this->isValidRFC && $this->isNoRFCWarnings && $this->isValidDNS && $this->isValidSpoofCheck );
     }

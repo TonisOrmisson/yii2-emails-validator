@@ -18,14 +18,12 @@ class EmailsValidationForm extends Model
     /** @var  EmailAddress[] $emailAddresses */
     public $emailAddresses;
 
-    /** @inheritdoc */
     public function init()
     {
         $this->module = \Yii::$app->getModule('emailsvalidator');
         parent::init();
     }
 
-    /** @inheritdoc */
     public function rules()
     {
         return [
@@ -34,7 +32,6 @@ class EmailsValidationForm extends Model
         ];
     }
 
-    /** @inheritdoc */
     public function attributeLabels()
     {
         return [
@@ -42,11 +39,10 @@ class EmailsValidationForm extends Model
         ];
     }
 
-    /** @inheritdoc */
     public function attributeHints()
     {
         return [
-            'textInput'=>Yii::t('app','The addresses can be delimited by line breaks, commas or semi-colons'),
+            'textInput'=>Yii::t('app','One e-mail address per line'),
         ];
     }
 
