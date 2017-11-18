@@ -28,7 +28,7 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
                             // hilight spaces
                             $word = " ";
                             $text = preg_replace ("/" . preg_quote($word, '/') . "/",
-                                "<span class='text-danger text-bold'>".Yii::t('app','[SPACE!!]')."</span>",
+                                "<span class='bg-primary'>&nbsp;</span>",
                                 $model->address);
                             return $text;
 
