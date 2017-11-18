@@ -6,6 +6,7 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
 use andmemasin\emailsvalidator\Module;
 use Yii;
 use yii\data\ArrayDataProvider;
+use yii\i18n\Formatter;
 use yii\web\Controller;
 use yii\filters\AccessControl;
 
@@ -56,6 +57,8 @@ class SiteController extends Controller
                     'pageSize' => count($model->emailAddresses),
                 ],
             ]);
+            $formatter = new Formatter();
+            Yii::$app->session->addFlash('success',Yii::t('app','Check complete in {0}!',[$formatter->asDuration(Yii::getLogger()->getElapsedTime())]));
         }
         return $this->render('index', [
             'model'=>$model,
