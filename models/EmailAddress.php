@@ -25,25 +25,31 @@ class EmailAddress extends Model
     public $address;
 
     /** @var boolean */
-    public $isValid = false;
+    public $isValid = true;
 
     /** @var boolean */
-    public $isValidRFC = false;
+    public $isValidRFC = true;
 
     /** @var boolean */
-    public $isNoRFCWarnings = false;
+    public $isNoRFCWarnings = true;
 
     /** @var boolean */
-    public $isValidDNS = false;
+    public $isValidDNS = true;
 
     /** @var boolean */
-    public $isValidSpoofCheck = false;
+    public $isValidSpoofCheck = true;
 
     /** @var boolean */
     public $needsTrimming;
 
     /** @var string $error */
     public $error;
+
+    /** @var  boolean */
+    public $checkDNS = true;
+
+    /** @var  boolean */
+    public $checkSpoof = true;
 
     public function init()
     {
@@ -75,8 +81,14 @@ class EmailAddress extends Model
     private function runValidator(){
         $this->isValidRFC = $this->validator->isValid($this->address, new RFCValidation());
         $this->isNoRFCWarnings = $this->validator->isValid($this->address, new NoRFCWarningsValidation());
-        $this->isValidDNS = $this->validator->isValid($this->address, new DNSCheckValidation());
-        $this->isValidSpoofCheck = $this->validator->isValid($this->address, new SpoofCheckValidation());
+
+        if($this->checkDNS){
+            $this->isValidDNS = $this->validator->isValid($this->address, new DNSCheckValidation());
+        }
+
+        if($this->checkSpoof) {
+            $this->isValidSpoofCheck = $this->validator->isValid($this->address, new SpoofCheckValidation());
+        }
 
         $this->setNeedsTrimming();
         $this->isValid = ($this->isValidRFC && $this->isNoRFCWarnings && $this->isValidDNS && $this->isValidSpoofCheck );

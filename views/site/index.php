@@ -19,6 +19,16 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'E-mail validation');
             <?php $form = ActiveForm::begin() ?>
             <?= $form->field($model, 'textInput')->textarea(['rows'=>10]); ?>
 
+            <div class="container">
+                <div class="row">
+                    <div class="col col-lg-2 col-md-2 col-sm-4 col-xs-4">
+                        <?= $form->field($model, 'checkDNS')->checkbox() ?>
+                    </div>
+                    <div class="col col-lg-2  col-md-2 col-sm-4 col-xs-4">
+                        <?= $form->field($model, 'checkSpoof')->checkbox() ?>
+                    </div>
+                </div>
+            </div>
             <div class="form-group">
                 <?= Html::submitButton(Yii::t('app', 'Validate'), ['class' => 'btn btn-primary']) ?>
             </div>
