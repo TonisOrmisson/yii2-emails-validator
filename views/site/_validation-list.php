@@ -35,7 +35,7 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
                         },
                         'contentOptions' => function ($model) {
                             /** @var EmailAddress $model */
-                            return ['class' => (!$model->isValid ? 'danger': null)];
+                            return ['class' => (!$model->isValid ? 'danger text-danger': 'text-success')];
                         },
                     ],
                     [
@@ -43,7 +43,7 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
                         'format'=>'boolean',
                         'contentOptions' => function ($model) {
                             /** @var EmailAddress $model */
-                            return ['class' => ($model->needsTrimming ? 'warning': null)];
+                            return ['class' => ($model->needsTrimming ? 'warning text-warning': 'text-success')];
                         },
                     ],
                     [
@@ -51,7 +51,7 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
                         'format'=>'boolean',
                         'contentOptions' => function ($model) {
                             /** @var EmailAddress $model */
-                            return ['class' => (!$model->isValid ? 'danger': null)];
+                            return ['class' => (!$model->isValid ? 'danger text-danger': 'text-success')];
                         },
                     ],
                     [
@@ -59,7 +59,7 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
                         'format'=>'boolean',
                         'contentOptions' => function ($model) {
                             /** @var EmailAddress $model */
-                            return ['class' => (!$model->isValidRFC ? 'danger': null)];
+                            return ['class' => (!$model->isValidRFC ? 'danger text-danger': 'text-success')];
                         },
                     ],
                     [
@@ -67,7 +67,7 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
                         'format'=>'boolean',
                         'contentOptions' => function ($model) {
                             /** @var EmailAddress $model */
-                            return ['class' => (!$model->isNoRFCWarnings ? 'danger': null)];
+                            return ['class' => (!$model->isNoRFCWarnings ? 'danger text-danger': 'text-success')];
                         },
                     ],
                     [
@@ -75,7 +75,7 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
                         'format'=>'boolean',
                         'contentOptions' => function ($model) {
                             /** @var EmailAddress $model */
-                            return ['class' => (!$model->isValidDNS ? 'danger': null)];
+                            return ['class' => (!$model->isValidDNS ? 'danger text-danger': 'text-success')];
                         },
                     ],
                     [
@@ -83,7 +83,7 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
                         'format'=>'boolean',
                         'contentOptions' => function ($model) {
                             /** @var EmailAddress $model */
-                            return ['class' => (!$model->isValidSpoofCheck ? 'danger': null)];
+                            return ['class' => (!$model->isValidSpoofCheck ? 'danger text-danger': 'text-success')];
                         },
                     ],
                 ],
