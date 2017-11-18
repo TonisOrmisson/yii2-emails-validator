@@ -22,6 +22,17 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
 
                     [
                         'attribute'=> 'address',
+                        'format'=>'raw',
+                        'value'=>function($model){
+                            /** @var EmailAddress $model */
+                            // hilight spaces
+                            $word = " ";
+                            $text = preg_replace ("/" . preg_quote($word, '/') . "/",
+                                "<span class='text-danger text-bold'>".Yii::t('app','[SPACE!!]')."</span>",
+                                $model->address);
+                            return $text;
+
+                        },
                         'contentOptions' => function ($model) {
                             /** @var EmailAddress $model */
                             return ['class' => (!$model->isValid ? 'danger': null)];
