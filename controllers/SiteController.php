@@ -44,10 +44,8 @@ class SiteController extends Controller
     public function actionIndex()
     {
 
-        $session = Yii::$app->session;
         /** @var EmailsValidationForm $model */
         $model = new EmailsValidationForm();
-
         $dataProvider = null;
 
         if($model->load(Yii::$app->request->post()) && $model->process()){
@@ -58,9 +56,16 @@ class SiteController extends Controller
                 ],
             ]);
             $formatter = new Formatter();
+
+            if(!empty($model->failingEmailAddresses)){
+                Yii::$app->session->addFlash('danger',Yii::t('app','There were {count} e-mail addresses that failed validation!',[
+                    'count'=>count($model->failingEmailAddresses)
+                ]));
+            }
             Yii::$app->session->addFlash('success',Yii::t('app','Checked {count} e-mails in {duration}!',[
                 'count'=>count($model->emailAddresses),
-                'duration'=>$formatter->asDuration(Yii::getLogger()->getElapsedTime())]));
+                'duration'=>$formatter->asDuration(Yii::getLogger()->getElapsedTime())
+            ]));
         }
         return $this->render('index', [
             'model'=>$model,

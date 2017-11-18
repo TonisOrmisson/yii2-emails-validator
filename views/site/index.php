@@ -3,7 +3,6 @@
 use andmemasin\emailsvalidator\models\EmailsValidationForm;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
-use yii;
 use yii\bootstrap\Alert;
 
 /* @var $this yii\web\View */
@@ -31,29 +30,33 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'E-mail validation');
 
 
     <div class="panel panel-default email-validation-results" id="email-validation-results">
-        <div class="panel-heading"><?= Yii::t('app','Input')?></div>
+        <div class="panel-heading">
+            <?= Yii::t('app','Input')?>
+            <a class="pull-right btn btn-default btn-xs" data-toggle="collapse" href="#emails-validation-input"><?=Yii::t('app','Show/hide')?></a>
+        </div>
 
-        <div class="panel-body">
-            <?php $form = ActiveForm::begin() ?>
-            <?= $form->field($model, 'textInput')->textarea(['rows'=>10]); ?>
+        <div id="emails-validation-input" class="panel-collapse collapse <?=(count($model->emailAddresses)>0 ? null:'in')?>">
+            <div class="panel-body ">
+                <?php $form = ActiveForm::begin() ?>
+                <?= $form->field($model, 'textInput')->textarea(['rows'=>10]); ?>
 
-            <div class="container">
-                <div class="row">
-                    <div class="col col-lg-2  col-md-2 col-sm-4 col-xs-4">
-                        <?= $form->field($model, 'displayOnlyProblems')->checkbox() ?>
-                    </div>
-                    <div class="col col-lg-2 col-md-2 col-sm-4 col-xs-4">
-                        <?= $form->field($model, 'checkDNS')->checkbox() ?>
-                    </div>
-                    <div class="col col-lg-2  col-md-2 col-sm-4 col-xs-4">
-                        <?= $form->field($model, 'checkSpoof')->checkbox() ?>
+                <div class="container">
+                    <div class="row">
+                        <div class="col col-lg-2  col-md-2 col-sm-4 col-xs-4">
+                            <?= $form->field($model, 'displayOnlyProblems')->checkbox() ?>
+                        </div>
+                        <div class="col col-lg-2 col-md-2 col-sm-4 col-xs-4">
+                            <?= $form->field($model, 'checkDNS')->checkbox() ?>
+                        </div>
+                        <div class="col col-lg-2  col-md-2 col-sm-4 col-xs-4">
+                            <?= $form->field($model, 'checkSpoof')->checkbox() ?>
+                        </div>
                     </div>
                 </div>
+                <div class="form-group">
+                    <?= Html::submitButton(Yii::t('app', 'Validate'), ['class' => 'btn btn-primary']) ?>
+                </div>
             </div>
-            <div class="form-group">
-                <?= Html::submitButton(Yii::t('app', 'Validate'), ['class' => 'btn btn-primary']) ?>
-            </div>
-        </div>
 
         </div>
     </div>
