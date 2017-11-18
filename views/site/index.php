@@ -21,6 +21,9 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'E-mail validation');
 
             <div class="container">
                 <div class="row">
+                    <div class="col col-lg-2  col-md-2 col-sm-4 col-xs-4">
+                        <?= $form->field($model, 'displayOnlyProblems')->checkbox() ?>
+                    </div>
                     <div class="col col-lg-2 col-md-2 col-sm-4 col-xs-4">
                         <?= $form->field($model, 'checkDNS')->checkbox() ?>
                     </div>

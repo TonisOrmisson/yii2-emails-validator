@@ -18,11 +18,17 @@ class EmailsValidationForm extends Model
     /** @var  EmailAddress[] $emailAddresses */
     public $emailAddresses;
 
+    /** @var  EmailAddress[] $failingEmailAddresses */
+    public $failingEmailAddresses;
+
     /** @var  boolean */
     public $checkDNS = true;
 
     /** @var  boolean */
     public $checkSpoof = true;
+
+    /** @var  boolean  */
+    public $displayOnlyProblems = true;
 
     public function init()
     {
@@ -35,7 +41,7 @@ class EmailsValidationForm extends Model
         return [
             [['textInput'], 'required'],
             [['textInput'], 'string', 'max' => 1024 * $this->module->maxInputKB],
-            [['checkDNS','checkSpoof'],'boolean'],
+            [['checkDNS','checkSpoof','displayOnlyProblems'],'boolean'],
         ];
     }
 
@@ -45,6 +51,7 @@ class EmailsValidationForm extends Model
             'textInput'=>Yii::t('app','E-mail addresses'),
             'checkDNS'=>Yii::t('app','Perform DNS check'),
             'checkSpoof'=>Yii::t('app','Perform spoofing check'),
+            'displayOnlyProblems'=>Yii::t('app','Display only e-mails with problems in results'),
         ];
     }
 
@@ -74,6 +81,9 @@ class EmailsValidationForm extends Model
                         ]);
 
                         $this->emailAddresses[] = $model;
+                        if(!$model->isValid){
+                            $this->failingEmailAddresses[] = $model;
+                        }
 
                     }
                 }

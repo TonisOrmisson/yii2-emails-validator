@@ -51,7 +51,7 @@ class SiteController extends Controller
 
         if($model->load(Yii::$app->request->post()) && $model->process()){
             $dataProvider = new ArrayDataProvider([
-                'allModels'=>$model->emailAddresses,
+                'allModels'=>($model->displayOnlyProblems ? $model->failingEmailAddresses:$model->emailAddresses),
                 'pagination' => [
                     'pageSize' => count($model->emailAddresses),
                 ],
