@@ -28,6 +28,14 @@ use andmemasin\emailsvalidator\models\EmailsValidationForm;
                         },
                     ],
                     [
+                        'attribute'=> 'needsTrimming',
+                        'format'=>'boolean',
+                        'contentOptions' => function ($model) {
+                            /** @var EmailAddress $model */
+                            return ['class' => ($model->needsTrimming ? 'warning': null)];
+                        },
+                    ],
+                    [
                         'attribute'=> 'isValid',
                         'format'=>'boolean',
                         'contentOptions' => function ($model) {
