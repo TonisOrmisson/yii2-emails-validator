@@ -65,7 +65,7 @@ class EmailAddress extends Model
             'address'=>Yii::t('app','E-mail address'),
             'isValid'=>Yii::t('app','Is valid?'),
             'isValidRFC'=>Yii::t('app','In line with RFC standard?'),
-            'isNoRFCWarnings'=>Yii::t('app','Any RFC warnings?'),
+            'isNoRFCWarnings'=>Yii::t('app','No RFC warnings?'),
             'isValidDNS'=>Yii::t('app','DNS check passed?'),
             'needsTrimming'=>Yii::t('app','Has spaces to be trimmed?'),
             'isValidSpoofCheck'=>Yii::t('app','Spoof check OK?'),

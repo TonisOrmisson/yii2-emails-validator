@@ -30,6 +30,9 @@ class EmailsValidationForm extends Model
     /** @var  boolean  */
     public $displayOnlyProblems = true;
 
+    /** @var  array Array of already checked domains */
+    public $checkedDomains = [];
+
     public function init()
     {
         $this->module = \Yii::$app->getModule('emailsvalidator');
