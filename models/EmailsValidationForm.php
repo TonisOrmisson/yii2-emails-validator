@@ -16,10 +16,10 @@ class EmailsValidationForm extends Model
     public $module;
 
     /** @var  EmailAddress[] $emailAddresses */
-    public $emailAddresses;
+    public $emailAddresses = [];
 
     /** @var  EmailAddress[] $failingEmailAddresses */
-    public $failingEmailAddresses;
+    public $failingEmailAddresses = [];
 
     /** @var  boolean */
     public $checkDNS = true;
