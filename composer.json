@@ -30,6 +30,11 @@
     "psr-4": {
       "andmemasin\\emailsvalidator\\": ""
     }
-  }
-
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  ]
 }
