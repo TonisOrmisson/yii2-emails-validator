@@ -28,7 +28,7 @@
 
   "autoload": {
     "psr-4": {
-      "andmemasin\\emailsvalidator\\": ""
+      "andmemasin\\emailsvalidator\\": "src"
     }
   },
   "repositories": [
