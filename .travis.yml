@@ -4,10 +4,7 @@ dist: trusty
 php:
     - 7.0
     - 5.6
-before_script:
-    # disable xdebug to speed up tests
-    - phpenv config-rm xdebug.ini
 
 script:
-    # install clean yii2-basic
-    - composer create-project --prefer-dist --stability=dev yiisoft/yii2-app-basic basic
+    - composer install
+    - php vendor/bin/codecept run --coverage --coverage-xml

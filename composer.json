@@ -20,6 +20,7 @@
 
   },
   "require-dev": {
+    "andmemasin/yii2-myabstract": "~2.5.5",
     "yiisoft/yii2-faker": "~2.0.0",
     "codeception/codeception": "^2.2.3",
     "codeception/verify": "~0.3.1",
