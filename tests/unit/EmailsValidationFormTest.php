@@ -2,9 +2,12 @@
 namespace andmemasin\emailsvalidator;
 
 use andmemasin\emailsvalidator\models\EmailsValidationForm;
+use andmemasin\myabstract\test\ModelTestTrait;
 
 class EmailsValidationFormTest extends \Codeception\Test\Unit
 {
+    use ModelTestTrait;
+
     /**
      * @var \andmemasin\emailsvalidator\UnitTester
      */
@@ -23,11 +26,7 @@ class EmailsValidationFormTest extends \Codeception\Test\Unit
     {
     }
 
-    // tests
-    public function testSomeFeature()
-    {
 
-    }
 
     /**
      * Returns a good working LimeSurvey collector
