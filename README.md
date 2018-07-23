@@ -3,6 +3,7 @@ A Yii2 module to do bulk e-mails validation
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/TonisOrmisson/yii2-emails-validator/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/TonisOrmisson/yii2-emails-validator/?branch=master)
 [![Build Status](https://travis-ci.org/TonisOrmisson/yii2-emails-validator.svg)](https://travis-ci.org/TonisOrmisson/yii2-emails-validator/)
+[![codecov](https://codecov.io/gh/TonisOrmisson/yii2-emails-validator/branch/master/graph/badge.svg)](https://codecov.io/gh/TonisOrmisson/yii2-emails-validator)
 
 
 
