@@ -8,3 +8,5 @@ php:
 script:
     - composer install
     - php vendor/bin/codecept run --coverage --coverage-xml
+after_success:
+- bash <(curl -s https://codecov.io/bash)

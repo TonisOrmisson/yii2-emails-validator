@@ -26,6 +26,17 @@ class EmailsValidationFormTest extends \Codeception\Test\Unit
     {
     }
 
+    public function testLoadEmailAddresses() {
+        $this->model->textInput = "tonis@andmemasin.eu\rinfo@andmemasin.eu,not-valid@i-do-not-exist.yii";
+        $result = $this->invokeMethod($this->model, 'loadEmailAddresses');
+        $this->assertEquals(2, count($this->model->emailAddresses));
+        $this->assertEquals(1, count($this->model->failingEmailAddresses));
+    }
+
+    public function testProcess() {
+        $this->assertEquals(true, $this->model->process());
+    }
+
 
 
     /**
