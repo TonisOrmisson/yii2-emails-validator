@@ -11,17 +11,20 @@ use yii\bootstrap\Alert;
 
 $this->title = Yii::t('app', 'Bulk e-mail validation');
 $this->params['breadcrumbs'][] = Yii::t('app', 'E-mail validation');
+
 ?>
 <div id="bulk-email-validation">
     <?php if($model->module->displayFlashMessages):?>
     <div class="row">
         <div class="col-xs-12">
-            <?php foreach (Yii::$app->session->allFlashes as $type => $message): ?>
+            <?php foreach (Yii::$app->session->getAllFlashes() as $type => $data): ?>
                 <?php if (in_array($type, ['success', 'danger', 'warning', 'info'])): ?>
-                    <?= Alert::widget([
-                        'options' => ['class' => 'alert-dismissible alert-' . $type],
-                        'body' => $message
-                    ]) ?>
+                    <?php foreach ($data as $message):?>
+                        <?= Alert::widget([
+                            'options' => ['class' => 'alert-dismissible alert-' . $type],
+                            'body' => $message
+                        ]) ?>
+                    <?php endforeach ?>
                 <?php endif ?>
             <?php endforeach ?>
         </div>

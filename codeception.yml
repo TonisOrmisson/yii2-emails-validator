@@ -17,3 +17,7 @@ coverage:
       - src/*
   exclude:
       - src/views/*
+modules:
+    config:
+        Yii2:
+          configFile: 'tests/_config/test.php'
