@@ -47,8 +47,7 @@ class EmailAddressTest extends \Codeception\Test\Unit
             ['name@gmail.com'],
             ['my.name@gmail.com'],
             ['mY.nAmE@gmAil.CoM'],
-            ['mY.nAmE@gmAil.Co.uk'],
-            ['mY.nAmE@gmAil.Co.uk.co.uk'],
+            ['name@amazon.Co.uk'],
         ];
     }
 
