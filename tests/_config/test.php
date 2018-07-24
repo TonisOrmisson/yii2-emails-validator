@@ -8,6 +8,7 @@ $config = [
         '@vendor' => '@app/../vendor',
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
+        '@webroot/assets' => '@app/../tests/assets',
     ],
     'modules' => [
         'emailsvalidator' => [
