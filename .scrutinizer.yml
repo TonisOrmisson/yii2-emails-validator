@@ -1,3 +1,14 @@
+build:
+  tests:
+    override:
+      - true
+
+  nodes:
+    tests: true
+    analysis:
+      tests:
+override: [php-scrutinizer-run]
+
 checks:
   php: true
 coding_style:
