@@ -22,15 +22,55 @@ class EmailAddressTest extends \Codeception\Test\Unit
         $this->model = $this->baseObject();
     }
 
-    protected function _after()
-    {
+
+    /**
+     * @return array
+     */
+    public function badAddressesProvider(){
+        return [
+            ['my email address'],
+            ['my .name@gmail.com'],
+            ['my.name @gmail.com'],
+            ['my.name@gmail. com'],
+            ['my.name@gmail,com'],
+            ['my.name@gmail;com'],
+            ['my.name@gmail,com'],
+        ];
     }
 
-    // tests
-    public function testSomeFeature()
-    {
 
+    /**
+     * @return array
+     */
+    public function goodAddressesProvider(){
+        return [
+            ['name@gmail.com'],
+            ['my.name@gmail.com'],
+            ['mY.nAmE@gmAil.CoM'],
+            ['mY.nAmE@gmAil.Co.uk'],
+            ['mY.nAmE@gmAil.Co.uk.co.uk'],
+        ];
     }
+
+
+    /**
+     * @dataProvider badAddressesProvider
+     */
+    public function testBadAddressesFail($address) {
+        $this->model = new EmailAddress(['address' => $address]);
+        $this->assertFalse($this->model->isValid);
+    }
+
+    /**
+     * @dataProvider goodAddressesProvider
+     */
+    public function testGoodAddressesDontFail($address) {
+        $this->model = new EmailAddress(['address' => $address]);
+        $this->assertTrue($this->model->isValid);
+    }
+
+
+
 
     /**
      * Returns a good working LimeSurvey collector
