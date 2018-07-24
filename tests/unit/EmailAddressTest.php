@@ -35,6 +35,9 @@ class EmailAddressTest extends \Codeception\Test\Unit
             ['my.name@gmail,com'],
             ['my.name@gmail;com'],
             ['my.name@gmail,com'],
+            [null],
+            [0],
+            [1.234],
         ];
     }
 
