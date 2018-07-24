@@ -48,8 +48,10 @@ class SiteControllerTest extends \Codeception\Test\Unit
         \Yii::$app->set('request', $request);
 
         $result = $this->model->actionIndex();
+    }
 
-
+    public function testBehaviors() {
+        $this->arrayHasKey('access', $this->model->behaviors());
     }
 
     /**
