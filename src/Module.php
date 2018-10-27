@@ -2,6 +2,8 @@
 
 namespace andmemasin\emailsvalidator;
 
+use Yii;
+
 
 class Module extends \yii\base\Module
 {
@@ -17,5 +19,19 @@ class Module extends \yii\base\Module
 
     /** @var boolean $displayFlashMessages whether the flash messages will be rendered ny the module. You can disable this if your app has a separate flash displaying system.  */
     public $displayFlashMessages = true;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function init()
+    {
+        parent::init();
+
+        if (Yii::$app instanceof \yii\console\Application) {
+            $this->controllerNamespace = 'andmemasin\emailsvalidator\commands';
+        }
+    }
+
+
 
 }
