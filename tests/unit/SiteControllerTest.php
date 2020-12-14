@@ -34,7 +34,7 @@ class SiteControllerTest extends \Codeception\Test\Unit
     public function testActionIndex()
     {
         $result = $this->model->actionIndex();
-        $this->assertInternalType('string', $result);
+        $this->assertIsString($result);
     }
 
     public function testActionIndexPost() {
