@@ -1,0 +1,27 @@
+name: Install & Run tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+
+      - name: Create project
+        run: composer create-project
+
+      - name: Install depeendencies
+        run: composer install
+
+
+      - name: Run tests on PHP container
+        run: php vendor/bin/codecept run --coverage --coverage-xml
+
+
+
