@@ -18,7 +18,7 @@ jobs:
 
 
       - name: Run tests on PHP container
-        run: php vendor/bin/codecept run --coverage --coverage-xml
+        run: php vendor/bin/codecept run
 
 
 
