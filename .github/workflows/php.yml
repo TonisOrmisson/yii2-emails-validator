@@ -17,7 +17,11 @@ jobs:
         run: composer install
 
       - name: Run tests on PHP container
-        run: php vendor/bin/codecept run
+        run: XDEBUG_MODE=coverage php vendor/bin/codecept run --coverage --coverage-xml
 
-
-
+      - name: Upload Code coverage
+        uses: codecov/codecov-action@v3.1.0
+        if: always()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          name: codecov-umbrella # optional
