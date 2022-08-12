@@ -13,9 +13,8 @@ jobs:
       - uses: actions/checkout@v2
 
 
-      - name: Install depeendencies
+      - name: Install dependencies
         run: composer install
-
 
       - name: Run tests on PHP container
         run: php vendor/bin/codecept run
