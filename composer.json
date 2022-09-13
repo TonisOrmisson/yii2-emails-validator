@@ -17,7 +17,8 @@
     "ext-intl": "*",
     "yiisoft/yii2": "~2.0.5",
     "yiisoft/yii2-bootstrap": "~2.0.0",
-    "egulias/email-validator":"~2.0"
+    "egulias/email-validator":"^3.2",
+    "tonisormisson/yii-usuario-views-bootstrap4": "^1.0"
 
   },
   "require-dev": {
