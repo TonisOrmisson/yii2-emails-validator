@@ -5,11 +5,11 @@ namespace andmemasin\emailsvalidator\models;
 
 use Egulias\EmailValidator\EmailValidator;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
-use Egulias\EmailValidator\Validation\SpoofCheckValidation;
+use Egulias\EmailValidator\Validation\Extra\SpoofCheckValidation;
 use yii\base\Model;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use Egulias\EmailValidator\Validation\DNSCheckValidation;
-use yii;
+use Yii;
 
 /**
  * Class EmailAddress

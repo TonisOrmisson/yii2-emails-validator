@@ -20,6 +20,9 @@ jobs:
       - name: Run tests on PHP container
         run: XDEBUG_MODE=coverage php vendor/bin/codecept run --coverage --coverage-xml
 
+      - name: Run static code analysis
+        run:  vendor/bin/phpstan analyse
+
       - name: Upload Code coverage
         uses: codecov/codecov-action@v3.1.0
         if: always()

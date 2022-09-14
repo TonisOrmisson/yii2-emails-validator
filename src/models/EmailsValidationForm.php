@@ -4,7 +4,7 @@ namespace andmemasin\emailsvalidator\models;
 
 use andmemasin\emailsvalidator\Module;
 use yii\base\Model;
-use yii;
+use Yii;
 
 class EmailsValidationForm extends Model
 {
