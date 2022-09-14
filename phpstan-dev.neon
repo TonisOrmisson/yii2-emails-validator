@@ -1,0 +1,16 @@
+includes:
+    - phpstan.neon
+parameters:
+    scanDirectories:
+        - ../actionlog/src
+        - ../collector/src
+        - ../emailsvalidator/src
+        - ../helpers/src
+        - ../inviter/src
+        - ../language/src
+        - ../myabstract/src
+        - ../survey/src
+        - ../surveyapp/src
+        - ../weights/src
+        - ../../../widgets/yii2-querybuilder/src
+        - ../../../widgets/yii2-json-form/src
