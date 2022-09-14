@@ -22,6 +22,17 @@ class EmailAddressTest extends \Codeception\Test\Unit
         $this->model = $this->baseObject();
     }
 
+    /**
+     * @return array
+     */
+    public function invalidTypeAddressesProvider(){
+        return [
+            [null]
+            [0],
+            [1.234],
+        ];
+    }
+
 
     /**
      * @return array
@@ -35,9 +46,6 @@ class EmailAddressTest extends \Codeception\Test\Unit
             ['my.name@gmail,com'],
             ['my.name@gmail;com'],
             ['my.name@gmail,com'],
-            [null],
-            [0],
-            [1.234],
         ];
     }
 
@@ -64,6 +72,15 @@ class EmailAddressTest extends \Codeception\Test\Unit
     }
 
     /**
+     * @dataProvider invalidTypeAddressesProvider
+     */
+    public function tesInvalidTypeAddressesThrow($address)
+    {
+        $this->expectException(\ErrorException::class);
+        $this->model = new EmailAddress(['address' => $address]);
+    }
+
+    /**
      * @dataProvider goodAddressesProvider
      */
     public function testGoodAddressesDontFail($address) {
@@ -79,7 +96,7 @@ class EmailAddressTest extends \Codeception\Test\Unit
      * @return EmailAddress
      */
     public function baseObject(){
-        $model = new EmailAddress();
+        $model = new EmailAddress(['address'=>'example@example.com']);
         return $model;
     }
 }

@@ -53,6 +53,9 @@ class EmailAddress extends Model
 
     public function init()
     {
+        if(empty($this->address)) {
+            throw new \ErrorException("need an address here!");
+        }
         parent::init();
         $this->validator = new EmailValidator();
 
