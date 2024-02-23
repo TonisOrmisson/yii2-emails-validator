@@ -86,10 +86,10 @@ if($model->checkSpoof){
 
 ?>
 <?php if($model->emailAddresses):?>
-    <div class="panel panel-primary email-validation-results" id="email-validation-results">
-        <div class="panel-heading"><?= Yii::t('app','Results')?></div>
+    <div class="card card-primary email-validation-results" id="email-validation-results">
+        <div class="card-header"><?= Yii::t('app','Results')?></div>
 
-        <div class="panel-body">
+        <div class="card-body">
             <?= \yii\grid\GridView::widget([
                 'dataProvider' => $dataProvider,
                 'columns' => $columns

@@ -3,7 +3,7 @@
 use andmemasin\emailsvalidator\models\EmailsValidationForm;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
-use yii\bootstrap\Alert;
+use yii\bootstrap5\Alert;
 
 /* @var $this yii\web\View */
 /* @var EmailsValidationForm $model */
@@ -32,14 +32,14 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'E-mail validation');
     <?php endif;?>
 
 
-    <div class="panel panel-default email-validation-results" id="email-validation-results">
-        <div class="panel-heading">
+    <div class="card card-default email-validation-results" id="email-validation-results">
+        <div class="card-header">
             <?= Yii::t('app','Input')?>
-            <a class="pull-right btn btn-default btn-xs" data-toggle="collapse" href="#emails-validation-input"><?=Yii::t('app','Show/hide')?></a>
+            <div class="float-right btn btn-default btn-xs" data-bs-toggle="collapse" data-bs-target="#emails-validation-input"><?=Yii::t('app','Show/hide')?></div>
         </div>
 
-        <div id="emails-validation-input" class="panel-collapse collapse <?=(count($model->emailAddresses)>0 ? null:'in')?>">
-            <div class="panel-body ">
+        <div id="emails-validation-input" class="card-collapse collapse <?=(count($model->emailAddresses)>0 ? null:'in')?>">
+            <div class="card-body ">
                 <?php $form = ActiveForm::begin() ?>
                 <?= $form->field($model, 'textInput')->textarea(['rows'=>10]); ?>
 
