@@ -3,7 +3,6 @@
 use andmemasin\emailsvalidator\models\EmailsValidationForm;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
-use yii\bootstrap5\Alert;
 
 /* @var $this yii\web\View */
 /* @var EmailsValidationForm $model */
@@ -20,10 +19,10 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'E-mail validation');
             <?php foreach (Yii::$app->session->getAllFlashes() as $type => $data): ?>
                 <?php if (in_array($type, ['success', 'danger', 'warning', 'info'])): ?>
                     <?php foreach ($data as $message):?>
-                        <?= Alert::widget([
-                            'options' => ['class' => 'alert-dismissible alert-' . $type],
-                            'body' => $message
-                        ]) ?>
+                        <div class="alert alert-<?=$type?> alert-dismissible fade show" role="alert">
+                            <?= $message ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
                     <?php endforeach ?>
                 <?php endif ?>
             <?php endforeach ?>
