@@ -21,7 +21,7 @@
     "egulias/email-validator": "^3|^4"
   },
   "require-dev": {
-    "andmemasin/yii2-myabstract": "^5.0",
+    "andmemasin/yii2-myabstract": "^9.0",
     "codeception/codeception": "^5.0",
     "codeception/module-filesystem": "^3.0.0",
     "codeception/module-yii2": "^1.1.7",
