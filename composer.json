@@ -27,6 +27,8 @@
     "codeception/module-yii2": "^1.1.7",
     "codeception/module-asserts": "^3.0.0",
     "codeception/module-db": "^3.0",
+    "infection/codeception-adapter": "^0.4.7",
+    "infection/infection": "^0.34",
     "phpstan/phpstan": "^1.8"
   },
   "config": {
@@ -38,6 +40,7 @@
       "enabled": false
     },
     "allow-plugins": {
+      "infection/extension-installer": true,
       "yiisoft/yii2-composer": true
     }
   },
