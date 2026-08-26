@@ -9,7 +9,9 @@ use Codeception\Test\Unit;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 use InvalidArgumentException;
+use yii\web\Application;
 use yii\web\Request;
+use yii\web\UrlManager;
 
 final class EmailsValidatorComponentTest extends Unit
 {
@@ -89,32 +91,60 @@ final class EmailsValidatorComponentTest extends Unit
         self::assertStringNotContainsString('<script>alert(1)</script>', $output);
     }
 
-    public function testYiiGetViewUsesTheConfiguredModulesPrefixedApiBasePath(): void
+    public function testYiiGetViewUsesPublicApiBasePathUnderStrictParsing(): void
     {
-        $request = Stub::make(Request::class, [
+        $application = new Application([
+            'id' => 'emails-validator-api-base-test',
+            'basePath' => dirname(__DIR__, 3),
+            'aliases' => [
+                '@vendor' => dirname(__DIR__, 3) . '/vendor',
+                '@webroot' => dirname(__DIR__, 2) . '/web',
+            ],
+            'modules' => [
+                'emailsvalidator' => ['class' => Module::class],
+            ],
+            'components' => [
+                'request' => ['cookieValidationKey' => 'emails-validator-api-base-test'],
+                'urlManager' => [
+                    'class' => UrlManager::class,
+                    'enablePrettyUrl' => true,
+                    'enableStrictParsing' => true,
+                    'showScriptName' => false,
+                ],
+            ],
+        ]);
+        (new Bootstrap())->bootstrap($application);
+        $application->set('request', Stub::make(Request::class, [
             'getIsPost' => false,
             'getMethod' => 'GET',
-            'getBaseUrl' => '/admin',
+            'getBaseUrl' => '',
             'getCsrfToken' => 'csrf-token',
-        ]);
-        $application = \Yii::$app;
-        $originalRequest = $application->get('request');
-        $application->set('request', $request);
+        ]));
 
-        try {
-            $module = $application->getModule('emailsvalidator');
-            self::assertTrue(method_exists($module, 'apiBasePath'));
-            $expectedApiBase = $module->apiBasePath();
-            $output = $application->getView()->renderFile(
-                dirname(__DIR__, 3) . '/src/views/site/index.php',
-                [],
-            );
-        } finally {
-            $application->set('request', $originalRequest);
-        }
+        $module = $application->getModule('emailsvalidator');
+        self::assertTrue(method_exists($module, 'apiBasePath'));
+        self::assertSame('/emailsvalidator/api/v1/email-validations', $module->apiBasePath());
+        $output = $application->getView()->renderFile(
+            dirname(__DIR__, 3) . '/src/views/site/index.php',
+            [],
+        );
 
-        self::assertStringContainsString('api-base="' . $expectedApiBase . '"', $output);
-        self::assertStringNotContainsString('api-base="/api/v1/email-validations"', $output);
+        self::assertStringContainsString(
+            'api-base="/emailsvalidator/api/v1/email-validations"',
+            $output,
+        );
+        self::assertStringNotContainsString('api-base="/emailsvalidator/api/email-validation/index"', $output);
+    }
+
+    public function testComponentInstancesUseUniqueControlIdsAndMatchingLabelTargets(): void
+    {
+        $javascript = (string) file_get_contents(dirname(__DIR__, 3) . '/resources/ui/emails-validator.js');
+
+        self::assertStringNotContainsString("'emails-validator-input'", $javascript);
+        self::assertStringNotContainsString('`emails-validator-${name}`', $javascript);
+        self::assertStringContainsString('this.instanceId', $javascript);
+        self::assertStringContainsString('label.setAttribute(\'for\', this.textInput.id)', $javascript);
+        self::assertStringContainsString('label.setAttribute(\'for\', input.id)', $javascript);
     }
 
     public function testBladeViewEscapesConfiguredValuesWhenRendered(): void

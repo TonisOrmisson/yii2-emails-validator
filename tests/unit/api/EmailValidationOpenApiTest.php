@@ -32,6 +32,14 @@ final class EmailValidationOpenApiTest extends Unit
         self::assertArrayHasKey('security', $operation['post']);
         self::assertSame([['cookieAuth' => []]], $operation['post']['security']);
         self::assertArrayHasKey('requestBody', $operation['post']);
+        $csrfParameters = array_values(array_filter(
+            $operation['post']['parameters'] ?? [],
+            static fn (array $parameter): bool => ($parameter['name'] ?? null) === 'X-CSRF-Token'
+                && ($parameter['in'] ?? null) === 'header',
+        ));
+        self::assertCount(1, $csrfParameters);
+        self::assertTrue($csrfParameters[0]['required'] ?? false);
+        self::assertSame(['type' => 'string'], $csrfParameters[0]['schema']);
         self::assertArrayHasKey('responses', $operation['post']);
         self::assertArrayHasKey('200', $operation['post']['responses']);
         self::assertArrayHasKey('422', $operation['post']['responses']);
@@ -45,7 +53,6 @@ final class EmailValidationOpenApiTest extends Unit
             ['textInput', 'checkDNS', 'checkSpoof', 'displayOnlyProblems'],
             $schemas['EmailValidationRequest']['required'],
         );
-        self::assertSame(131072, $schemas['EmailValidationRequest']['properties']['textInput']['maxLength']);
         self::assertSame(
             ['address', 'needs_trimming', 'is_valid', 'is_valid_rfc', 'is_no_rfc_warnings', 'is_valid_dns', 'is_valid_spoof_check'],
             $schemas['EmailValidationResult']['required'],
@@ -55,5 +62,17 @@ final class EmailValidationOpenApiTest extends Unit
         self::assertSame('apiKey', $securitySchemes['cookieAuth']['type']);
         self::assertSame('header', $securitySchemes['cookieAuth']['in']);
         self::assertSame('Cookie', $securitySchemes['cookieAuth']['name']);
+    }
+
+    public function testOpenApiDocumentsConfigurableInputLimitInsteadOfUniversalByteLimit(): void
+    {
+        $path = dirname(__DIR__, 3) . '/resources/openapi/email-validation-v1.json';
+        $document = json_decode((string) file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
+        $schema = $document['components']['schemas']['EmailValidationRequest'];
+
+        self::assertArrayNotHasKey('maxLength', $schema['properties']['textInput']);
+        $description = $document['info']['description'] ?? '';
+        self::assertStringContainsString('128 KB', $description);
+        self::assertStringContainsString('configur', strtolower($description));
     }
 }
