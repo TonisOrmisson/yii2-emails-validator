@@ -113,6 +113,11 @@ class EmailAddressTest extends \Codeception\Test\Unit
         new EmailAddress(['address' => '']);
     }
 
+    public function testZeroAddressStillRaisesCompatibilityException(): void
+    {
+        $this->expectException(\ErrorException::class);
+        new EmailAddress(['address' => '0']);
+    }
 
 
 
