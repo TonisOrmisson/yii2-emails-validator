@@ -16,7 +16,7 @@ final class Bootstrap implements BootstrapInterface
         }
 
         foreach ($app->getModules() as $id => $definition) {
-            $class = is_array($definition) ? ($definition['class'] ?? null) : null;
+            $class = is_array($definition) ? ($definition['class'] ?? null) : $definition;
             if ($definition instanceof Module || (is_string($class) && is_a($class, Module::class, true))) {
                 $rules = Module::apiRouteRules((string) $id);
                 $app->urlManager->addRules($rules, false);
