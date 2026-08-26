@@ -61,18 +61,23 @@ final class EmailValidationController extends Controller
         $responder = new EmailValidationApiResponder();
 
         try {
-            try {
-                $body = Yii::$app->request->getBodyParams();
-            } catch (BadRequestHttpException) {
-                throw new EmailValidationException([
-                    'request' => ['The request body must be a valid JSON object.'],
-                ]);
-            }
-            if ($body === [] && str_starts_with(
-                strtolower((string) Yii::$app->request->getContentType()),
+            $httpRequest = Yii::$app->request;
+            $rawBody = $httpRequest->getRawBody();
+            $isJsonRequest = str_starts_with(
+                strtolower((string) $httpRequest->getContentType()),
                 'application/json',
-            )) {
-                $body = $this->decodeJsonBody(Yii::$app->request->getRawBody());
+            );
+
+            if ($isJsonRequest && $rawBody !== '') {
+                $body = $this->decodeJsonBody($rawBody);
+            } else {
+                try {
+                    $body = $httpRequest->getBodyParams();
+                } catch (BadRequestHttpException) {
+                    throw new EmailValidationException([
+                        'request' => ['The request body must be a valid JSON object.'],
+                    ]);
+                }
             }
             $request = EmailValidationRequest::fromArray($this->normalizeBody($body));
             $result = $this->module->getValidationService()->validate($request);
