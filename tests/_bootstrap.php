@@ -2,24 +2,7 @@
 defined('YII_DEBUG') or define('YII_DEBUG', true);
 defined('YII_ENV') or define('YII_ENV', 'test');
 
-$autoloadPaths = [
-    __DIR__ . '/../vendor/autoload.php',
-    dirname(__DIR__, 4) . '/vendor/autoload.php',
-];
-
-$autoloadFile = null;
-foreach ($autoloadPaths as $candidate) {
-    if (is_file($candidate)) {
-        $autoloadFile = $candidate;
-        break;
-    }
-}
-
-if ($autoloadFile === null) {
-    throw new RuntimeException('Unable to locate Composer autoload.php for emails validator tests.');
-}
-
-require_once($autoloadFile);
+require_once __DIR__ . '/_support/vendor.php';
 
 $yiiPaths = [
     __DIR__ . '/../vendor/yiisoft/yii2/Yii.php',

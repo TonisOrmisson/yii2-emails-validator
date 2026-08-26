@@ -4,6 +4,7 @@ namespace andmemasin\emailsvalidator;
 use andmemasin\emailsvalidator\models\EmailAddress;
 use andmemasin\myabstract\test\ModelTestTrait;
 use Codeception\Stub;
+use Yii;
 
 class EmailAddressTest extends \Codeception\Test\Unit
 {
@@ -86,6 +87,30 @@ class EmailAddressTest extends \Codeception\Test\Unit
     public function testGoodAddressesDontFail($address) {
         $this->model = new EmailAddress(['address' => $address]);
         $this->assertTrue($this->model->isValid);
+    }
+
+    public function testCompatibilityPropertiesPreserveSpacesAndDisabledChecks(): void
+    {
+        $this->model = new EmailAddress([
+            'address' => ' good@example.com ',
+            'checkDNS' => false,
+            'checkSpoof' => false,
+        ]);
+
+        $this->assertSame(' good@example.com ', $this->model->address);
+        $this->assertTrue($this->model->needsTrimming);
+        $this->assertFalse($this->model->isValid);
+        $this->assertFalse($this->model->isValidRFC);
+        $this->assertFalse($this->model->isNoRFCWarnings);
+        $this->assertTrue($this->model->isValidDNS);
+        $this->assertTrue($this->model->isValidSpoofCheck);
+        $this->assertSame(Yii::t('app', 'E-mail address'), $this->model->attributeLabels()['address']);
+    }
+
+    public function testEmptyAddressStillRaisesCompatibilityException(): void
+    {
+        $this->expectException(\ErrorException::class);
+        new EmailAddress(['address' => '']);
     }
 
 

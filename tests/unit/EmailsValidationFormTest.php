@@ -37,6 +37,33 @@ class EmailsValidationFormTest extends \Codeception\Test\Unit
         $this->assertEquals(true, $this->model->process());
     }
 
+    public function testProcessWithChecksDisabledPreservesInputAndFailureSubset(): void
+    {
+        $this->model->textInput = "good@example.com\r\n\r\n bad@example.com\nnot-an-email";
+        $this->model->checkDNS = false;
+        $this->model->checkSpoof = false;
+        $this->model->displayOnlyProblems = false;
+
+        $this->assertTrue($this->model->process());
+        $this->assertSame(3, count($this->model->emailAddresses));
+        $this->assertSame(2, count($this->model->failingEmailAddresses));
+        $this->assertSame(' bad@example.com', $this->model->emailAddresses[1]->address);
+        $this->assertTrue($this->model->emailAddresses[1]->needsTrimming);
+        $this->assertFalse($this->model->emailAddresses[1]->isValid);
+        $this->assertTrue($this->model->displayOnlyProblems === false);
+    }
+
+    public function testValidationRulesKeepConfiguredMaximumAndBooleanFields(): void
+    {
+        $rules = $this->model->rules();
+        $ruleText = json_encode($rules);
+
+        $this->assertStringContainsString((string) (128 * 1024), $ruleText);
+        $this->assertStringContainsString('checkDNS', $ruleText);
+        $this->assertStringContainsString('checkSpoof', $ruleText);
+        $this->assertStringContainsString('displayOnlyProblems', $ruleText);
+    }
+
 
 
     /**
