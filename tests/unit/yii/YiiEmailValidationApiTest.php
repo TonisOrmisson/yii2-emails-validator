@@ -196,30 +196,63 @@ final class YiiEmailValidationApiTest extends Unit
         self::assertSame(1, $response->data['meta']['total']);
     }
 
-    public function testJsonBodyIsUsedWhenParsedBodyIsEmptyAndMalformedJsonStaysGeneric(): void
+    public function testRawJsonObjectBodySucceedsWithoutAConfiguredParser(): void
     {
-        $this->assertControllerAvailable();
-        $module = \Yii::$app->getModule('emailsvalidator');
-        $module->accessPermissionName = 'configured.email.permission';
-        $controller = new EmailValidationController('email-validation', $module);
-
-        $valid = $this->callRaw($controller, json_encode([
+        $controller = $this->controller();
+        $response = $this->callRaw($controller, json_encode([
             'textInput' => 'good@example.com',
             'checkDNS' => false,
             'checkSpoof' => false,
             'displayOnlyProblems' => false,
         ], JSON_THROW_ON_ERROR));
-        self::assertSame(200, $valid->statusCode);
-        self::assertSame(1, $valid->data['meta']['total']);
 
-        $malformed = $this->callRaw($controller, '{"textInput":"good@example.com",');
-        self::assertSame(422, $malformed->statusCode);
-        self::assertArrayHasKey('errors', $malformed->data);
-        $encoded = json_encode($malformed->data);
-        self::assertIsString($encoded);
-        self::assertStringNotContainsString('Exception', $encoded);
-        self::assertStringNotContainsString('Syntax error', $encoded);
-        self::assertStringNotContainsString('{"textInput":"good@example.com",', $encoded);
+        self::assertSame(200, $response->statusCode);
+        self::assertSame(1, $response->data['meta']['total']);
+    }
+
+    public function testMalformedJsonReturnsAGenericRequestErrorWithoutAConfiguredParser(): void
+    {
+        $response = $this->callRaw($this->controller(), '{"textInput":"good@example.com",');
+
+        self::assertSame(422, $response->statusCode);
+        self::assertSame([
+            'errors' => [
+                'request' => ['The request body must be a valid JSON object.'],
+            ],
+        ], $response->data);
+    }
+
+    public function testJsonListAndScalarBodiesReturnAGenericRequestErrorWithoutAConfiguredParser(): void
+    {
+        foreach ([["good@example.com"], 'true'] as $body) {
+            $response = $this->callRaw(
+                $this->controller(),
+                is_string($body) ? $body : json_encode($body, JSON_THROW_ON_ERROR),
+            );
+
+            self::assertSame(422, $response->statusCode);
+            self::assertSame([
+                'errors' => [
+                    'request' => ['The request body must be a valid JSON object.'],
+                ],
+            ], $response->data);
+        }
+    }
+
+    public function testNumericKeyJsonObjectKeepsObjectSemanticsWithoutAConfiguredParser(): void
+    {
+        $response = $this->callRaw($this->controller(), json_encode([
+            0 => 'unexpected',
+            'textInput' => 'good@example.com',
+            'checkDNS' => false,
+            'checkSpoof' => false,
+            'displayOnlyProblems' => false,
+        ], JSON_THROW_ON_ERROR));
+
+        self::assertSame(422, $response->statusCode);
+        self::assertArrayHasKey(0, $response->data['errors']);
+        self::assertSame(['Unknown property.'], $response->data['errors'][0]);
+        self::assertArrayNotHasKey('request', $response->data['errors']);
     }
 
     public function testRequestPipelineRejectsUnauthorizedPost(): void
@@ -424,20 +457,23 @@ final class YiiEmailValidationApiTest extends Unit
 
     private function callRaw(EmailValidationController $controller, string $body): Response
     {
-        $request = Stub::make(Request::class, [
-            'getIsPost' => true,
-            'getMethod' => 'POST',
-            'getBodyParams' => [],
-            'getRawBody' => $body,
-            'getContentType' => 'application/json',
-        ]);
-        \Yii::$app->set('request', $request);
-        \Yii::$app->response->format = Response::FORMAT_JSON;
+        $request = new Request(['parsers' => []]);
+        $request->setRawBody($body);
+        $server = $_SERVER;
+        $_SERVER['REQUEST_METHOD'] = 'PUT';
+        $_SERVER['CONTENT_TYPE'] = 'application/json';
 
-        $response = $controller->actionIndex();
-        self::assertInstanceOf(Response::class, $response);
+        try {
+            \Yii::$app->set('request', $request);
+            \Yii::$app->response->format = Response::FORMAT_JSON;
 
-        return $response;
+            $response = $controller->actionIndex();
+            self::assertInstanceOf(Response::class, $response);
+
+            return $response;
+        } finally {
+            $_SERVER = $server;
+        }
     }
 
     private function controller(): EmailValidationController
