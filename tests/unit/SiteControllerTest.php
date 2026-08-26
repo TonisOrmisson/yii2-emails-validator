@@ -91,12 +91,17 @@ class SiteControllerTest extends \Codeception\Test\Unit
     public function testLegacyResultsEncodeUntrustedAddressesBeforeHighlightingSpaces(): void
     {
         $email = new EmailAddress([
-            'address' => '<script>alert(1)</script> @example.com',
+            'address' => ' <script>alert(1)</script> @example.com ',
+            'checkDNS' => false,
+            'checkSpoof' => false,
+        ]);
+        $valid = new EmailAddress([
+            'address' => 'good@example.com',
             'checkDNS' => false,
             'checkSpoof' => false,
         ]);
         $form = new EmailsValidationForm();
-        $form->emailAddresses = [$email];
+        $form->emailAddresses = [$email, $valid];
         $form->checkDNS = false;
         $form->checkSpoof = false;
         $view = \Yii::$app->getView();
@@ -104,13 +109,16 @@ class SiteControllerTest extends \Codeception\Test\Unit
             dirname(__DIR__, 2) . '/src/views/site/_validation-list.php',
             [
                 'model' => $form,
-                'dataProvider' => new ArrayDataProvider(['allModels' => [$email]]),
+                'dataProvider' => new ArrayDataProvider(['allModels' => [$email, $valid]]),
             ],
         );
 
         $this->assertStringNotContainsString('<script>', $output);
         $this->assertStringContainsString('&lt;script&gt;', $output);
         $this->assertStringContainsString('bg-primary', $output);
+        $this->assertStringContainsString('danger text-danger', $output);
+        $this->assertStringContainsString('text-success', $output);
+        $this->assertStringContainsString('warning text-warning', $output);
     }
 
     /**

@@ -89,6 +89,34 @@ final class EmailsValidatorComponentTest extends Unit
         self::assertStringNotContainsString('<script>alert(1)</script>', $output);
     }
 
+    public function testYiiGetViewUsesTheConfiguredModulesPrefixedApiBasePath(): void
+    {
+        $request = Stub::make(Request::class, [
+            'getIsPost' => false,
+            'getMethod' => 'GET',
+            'getBaseUrl' => '/admin',
+            'getCsrfToken' => 'csrf-token',
+        ]);
+        $application = \Yii::$app;
+        $originalRequest = $application->get('request');
+        $application->set('request', $request);
+
+        try {
+            $module = $application->getModule('emailsvalidator');
+            self::assertTrue(method_exists($module, 'apiBasePath'));
+            $expectedApiBase = $module->apiBasePath();
+            $output = $application->getView()->renderFile(
+                dirname(__DIR__, 3) . '/src/views/site/index.php',
+                [],
+            );
+        } finally {
+            $application->set('request', $originalRequest);
+        }
+
+        self::assertStringContainsString('api-base="' . $expectedApiBase . '"', $output);
+        self::assertStringNotContainsString('api-base="/api/v1/email-validations"', $output);
+    }
+
     public function testBladeViewEscapesConfiguredValuesWhenRendered(): void
     {
         $output = $this->renderBlade([
@@ -156,6 +184,28 @@ final class EmailsValidatorComponentTest extends Unit
         ] as $contract) {
             self::assertStringContainsString($contract, $javascript);
         }
+    }
+
+    public function testComponentMarksInvalidValidAndTrimmingResultsWithSafeTextNodes(): void
+    {
+        $javascriptPath = dirname(__DIR__, 3) . '/resources/ui/emails-validator.js';
+        $stylesheetPath = dirname(__DIR__, 3) . '/resources/ui/emails-validator.css';
+        $javascript = (string) file_get_contents($javascriptPath);
+        $stylesheet = (string) file_get_contents($stylesheetPath);
+
+        self::assertStringContainsString('classList', $javascript);
+        self::assertStringContainsString('result.is_valid', $javascript);
+        self::assertStringContainsString('result.needs_trimming', $javascript);
+        foreach (["'error'", "'success'", "'warning'"] as $class) {
+            self::assertStringContainsString($class, $javascript);
+        }
+        foreach (['.error', '.success', '.warning'] as $class) {
+            self::assertStringContainsString($class, $stylesheet);
+        }
+
+        self::assertStringContainsString('textContent', $javascript);
+        self::assertStringNotContainsString('innerHTML', $javascript);
+        self::assertStringNotContainsString('insertAdjacentHTML', $javascript);
     }
 
     /** @param array<string, string> $values */

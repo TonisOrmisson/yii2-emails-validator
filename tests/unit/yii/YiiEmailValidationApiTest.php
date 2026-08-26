@@ -13,8 +13,10 @@ use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\IdentityInterface;
 use yii\web\MethodNotAllowedHttpException;
+use yii\web\Application;
 use yii\web\Request;
 use yii\web\Response;
+use yii\web\UrlManager;
 use yii\web\User;
 
 final class TestApiAccessChecker implements CheckAccessInterface
@@ -69,6 +71,38 @@ final class YiiEmailValidationApiTest extends Unit
         self::assertCount(1, $routes);
         self::assertArrayHasKey('POST api/v1/email-validations', $routes);
         self::assertStringContainsString('email-validation', (string) $routes['POST api/v1/email-validations']);
+
+        self::assertSame([
+            'POST custom-emails/api/v1/email-validations' => 'custom-emails/api/email-validation/index',
+        ], Module::apiRouteRules('custom-emails'));
+    }
+
+    public function testConfiguredModuleBootstrapRegistersItsPrefixedApiRouteWithoutRootConfig(): void
+    {
+        $app = new Application([
+            'id' => 'emails-validator-bootstrap-test',
+            'basePath' => dirname(__DIR__, 3),
+            'modules' => [
+                'custom-emails' => ['class' => Module::class],
+            ],
+            'components' => [
+                'request' => ['cookieValidationKey' => 'emails-validator-bootstrap-test'],
+                'urlManager' => [
+                    'class' => UrlManager::class,
+                    'enablePrettyUrl' => true,
+                    'showScriptName' => false,
+                ],
+            ],
+        ]);
+
+        self::assertTrue(class_exists(Bootstrap::class), 'EmailsValidator Yii bootstrap is missing.');
+        (new Bootstrap())->bootstrap($app);
+
+        $app->request->setPathInfo('custom-emails/api/v1/email-validations');
+        self::assertSame(
+            ['custom-emails/api/email-validation/index', []],
+            $app->urlManager->parseRequest($app->request),
+        );
     }
 
     public function testApiControllerUsesConfiguredPermissionPostOnlyAndKeepsCsrfEnabled(): void
