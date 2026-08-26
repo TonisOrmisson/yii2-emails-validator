@@ -44,9 +44,9 @@ final class EmailValidationController extends Controller
     {
         try {
             return parent::beforeAction($action);
-        } catch (BadRequestHttpException $exception) {
+        } catch (BadRequestHttpException) {
             if (!$this->hasValidCsrfHeader()) {
-                throw $exception;
+                throw new BadRequestHttpException('Unable to verify your data submission.');
             }
 
             $this->setInvalidJsonResponse();
