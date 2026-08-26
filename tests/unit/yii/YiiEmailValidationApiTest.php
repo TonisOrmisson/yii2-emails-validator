@@ -7,8 +7,55 @@ namespace andmemasin\emailsvalidator;
 use Codeception\Stub;
 use Codeception\Test\Unit;
 use andmemasin\emailsvalidator\controllers\api\EmailValidationController;
+use yii\base\Action;
+use yii\rbac\CheckAccessInterface;
+use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
+use yii\web\IdentityInterface;
+use yii\web\MethodNotAllowedHttpException;
 use yii\web\Request;
 use yii\web\Response;
+use yii\web\User;
+
+final class TestApiAccessChecker implements CheckAccessInterface
+{
+    public function __construct(private readonly bool $allowed)
+    {
+    }
+
+    public function checkAccess($userId, $permissionName, $params = []): bool
+    {
+        return $this->allowed;
+    }
+}
+
+final class TestApiIdentity implements IdentityInterface
+{
+    public static function findIdentity($id): ?self
+    {
+        return new self();
+    }
+
+    public static function findIdentityByAccessToken($token, $type = null): ?self
+    {
+        return new self();
+    }
+
+    public function getId()
+    {
+        return 1;
+    }
+
+    public function getAuthKey()
+    {
+        return 'test-auth-key';
+    }
+
+    public function validateAuthKey($authKey): bool
+    {
+        return $authKey === 'test-auth-key';
+    }
+}
 
 final class YiiEmailValidationApiTest extends Unit
 {
@@ -71,6 +118,68 @@ final class YiiEmailValidationApiTest extends Unit
         self::assertStringNotContainsString('Exception', json_encode($invalid->data));
     }
 
+    public function testRequestPipelineRejectsUnauthorizedPost(): void
+    {
+        $this->configureAccess(false);
+        $this->setRequest('POST', true);
+        $controller = $this->controller();
+
+        try {
+            $controller->beforeAction(new Action('index', $controller));
+            self::fail('An unauthorized request must be rejected by the access filter.');
+        } catch (ForbiddenHttpException) {
+            self::assertTrue(true);
+        }
+    }
+
+    public function testRequestPipelineRejectsNonPostVerb(): void
+    {
+        $this->configureAccess(true);
+        $this->setRequest('GET', true);
+        $controller = $this->controller();
+
+        try {
+            $controller->beforeAction(new Action('index', $controller));
+            self::fail('A non-POST request must be rejected by the verb filter.');
+        } catch (MethodNotAllowedHttpException) {
+            self::assertTrue(true);
+        }
+    }
+
+    public function testRequestPipelineRejectsPostWithoutCsrfToken(): void
+    {
+        $this->configureAccess(true);
+        $this->setRequest('POST', false);
+        $controller = $this->controller();
+        self::assertTrue($controller->enableCsrfValidation);
+        self::assertFalse(\Yii::$app->getRequest()->validateCsrfToken());
+
+        try {
+            $controller->beforeAction(new Action('index', $controller));
+            self::fail('A POST without a valid CSRF token must be rejected.');
+        } catch (BadRequestHttpException) {
+            self::assertTrue(true);
+        }
+    }
+
+    public function testAuthorizedPostPassesThePipelineBeforeReturningJson(): void
+    {
+        $this->configureAccess(true);
+        $this->setRequest('POST', true, [
+            'textInput' => 'good@example.com',
+            'checkDNS' => false,
+            'checkSpoof' => false,
+            'displayOnlyProblems' => false,
+        ]);
+        $controller = $this->controller();
+
+        self::assertTrue($controller->beforeAction(new Action('index', $controller)));
+        $response = $controller->actionIndex();
+
+        self::assertSame(200, $response->statusCode);
+        self::assertSame(1, $response->data['meta']['total']);
+    }
+
     private function call(EmailValidationController $controller, array $body): Response
     {
         $request = Stub::make(Request::class, [
@@ -85,6 +194,37 @@ final class YiiEmailValidationApiTest extends Unit
         self::assertInstanceOf(Response::class, $response);
 
         return $response;
+    }
+
+    private function controller(): EmailValidationController
+    {
+        $this->assertControllerAvailable();
+        $module = \Yii::$app->getModule('emailsvalidator');
+        $module->accessPermissionName = 'configured.email.permission';
+
+        return new EmailValidationController('email-validation', $module);
+    }
+
+    private function configureAccess(bool $allowed): void
+    {
+        \Yii::$app->set('user', [
+            'class' => User::class,
+            'identityClass' => TestApiIdentity::class,
+        ]);
+        $user = \Yii::$app->getUser();
+        $user->setIdentity(new TestApiIdentity());
+        $user->accessChecker = new TestApiAccessChecker($allowed);
+    }
+
+    private function setRequest(string $method, bool $csrfValid, array $body = []): void
+    {
+        \Yii::$app->set('request', Stub::make(Request::class, [
+            'getIsPost' => $method === 'POST',
+            'getMethod' => $method,
+            'getUserIP' => '127.0.0.1',
+            'getBodyParams' => $body,
+            'validateCsrfToken' => $csrfValid,
+        ]));
     }
 
     private function assertControllerAvailable(): void

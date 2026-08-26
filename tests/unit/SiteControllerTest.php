@@ -4,6 +4,7 @@ namespace andmemasin\emailsvalidator;
 use andmemasin\emailsvalidator\controllers\SiteController;
 use andmemasin\emailsvalidator\models\EmailAddress;
 use andmemasin\emailsvalidator\models\EmailsValidationForm;
+use andmemasin\emailsvalidator\validation\EmailValidationException;
 use Codeception\Stub;
 use yii\base\Action;
 use yii\data\ArrayDataProvider;
@@ -51,6 +52,36 @@ class SiteControllerTest extends \Codeception\Test\Unit
         \Yii::$app->set('request', $request);
 
         $result = $this->model->actionIndex();
+
+        $this->assertIsString($result);
+        $this->assertStringContainsString('id="bulk-email-validation"', $result);
+        $this->assertStringContainsString('id="email-validation-results"', $result);
+        $this->assertStringContainsString('tonis@andmemasin.eu', $result);
+        $this->assertStringContainsString('not-valid@i-do-not-exist.yii', $result);
+    }
+
+    public function testOverLimitPostStaysOnTheLegacyPageWithAValidationError(): void
+    {
+        $request = $this->mockRequest([
+            'textInput' => str_repeat('a', 128 * 1024 + 1),
+            'checkDNS' => false,
+            'checkSpoof' => false,
+            'displayOnlyProblems' => false,
+        ]);
+        \Yii::$app->set('request', $request);
+
+        $result = null;
+        try {
+            $result = $this->model->actionIndex();
+        } catch (EmailValidationException) {
+            // The legacy action must convert the shared validation error into a page error.
+        }
+
+        $this->assertIsString($result, 'An over-limit legacy submission must stay on the page.');
+        $this->assertStringContainsString('id="bulk-email-validation"', $result);
+        $this->assertStringContainsString('emailsvalidationform-textinput', $result);
+        $this->assertStringContainsString('has-error', $result);
+        $this->assertStringNotContainsString('<emails-validator', $result);
     }
 
     public function testBehaviors() {
@@ -96,6 +127,8 @@ class SiteControllerTest extends \Codeception\Test\Unit
             'getUserIP' =>'127.0.0.1',
             'enableCookieValidation' => false,
             'getUserAgent' => 'Dummy User Agent',
+            'getIsPost' => true,
+            'getMethod' => 'POST',
             'getBodyParams' => [
                 'EmailsValidationForm' => $data
             ],
