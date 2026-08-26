@@ -232,6 +232,28 @@ final class YiiEmailValidationApiTest extends Unit
         }
     }
 
+    public function testRequestPipelineRejectsPostWithInvalidCsrfToken(): void
+    {
+        $this->configureAccess(true);
+        \Yii::$app->set('request', Stub::make(Request::class, [
+            'getIsPost' => true,
+            'getMethod' => 'POST',
+            'getUserIP' => '127.0.0.1',
+            'getBodyParams' => [],
+            'getCsrfToken' => 'server-token',
+            'getCsrfTokenFromHeader' => 'invalid-token',
+            'validateCsrfToken' => false,
+        ]));
+        $controller = $this->controller();
+
+        try {
+            $controller->beforeAction(new Action('index', $controller));
+            self::fail('A POST with an invalid CSRF token must be rejected.');
+        } catch (BadRequestHttpException) {
+            self::assertTrue(true);
+        }
+    }
+
     public function testAuthorizedPostPassesThePipelineBeforeReturningJson(): void
     {
         $this->configureAccess(true);
@@ -248,6 +270,58 @@ final class YiiEmailValidationApiTest extends Unit
 
         self::assertSame(200, $response->statusCode);
         self::assertSame(1, $response->data['meta']['total']);
+    }
+
+    public function testAuthorizedPostWithParserFailureIsNormalizedByTheRequestPipeline(): void
+    {
+        $this->configureAccess(true);
+        $parserDetails = 'configured parser detail: malformed JSON';
+        $parserCalls = 0;
+        $rawBody = '{"textInput":"parser-secret",';
+
+        \Yii::$app->set('request', Stub::make(Request::class, [
+            'getIsPost' => true,
+            'getMethod' => 'POST',
+            'getUserIP' => '127.0.0.1',
+            'getBodyParams' => static function () use (&$parserCalls, $parserDetails): array {
+                ++$parserCalls;
+                throw new BadRequestHttpException($parserDetails);
+            },
+            'getCsrfToken' => 'csrf-token',
+            'getCsrfTokenFromHeader' => 'csrf-token',
+            'getRawBody' => $rawBody,
+            'getContentType' => 'application/json',
+        ]));
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        $controller = $this->controller();
+
+        $result = null;
+        $exception = null;
+        try {
+            $result = $controller->runAction('index');
+        } catch (BadRequestHttpException $caught) {
+            $exception = $caught;
+        }
+
+        self::assertNull(
+            $exception,
+            $exception === null
+                ? 'The parser was not invoked by the Yii request pipeline.'
+                : 'The configured JSON parser exception leaked: ' . $exception->getMessage(),
+        );
+        self::assertNull($result);
+        self::assertSame(1, $parserCalls);
+        self::assertSame(422, \Yii::$app->response->statusCode);
+        self::assertSame([
+            'errors' => [
+                'request' => ['The request body must be a valid JSON object.'],
+            ],
+        ], \Yii::$app->response->data);
+
+        $encoded = json_encode(\Yii::$app->response->data);
+        self::assertIsString($encoded);
+        self::assertStringNotContainsString($parserDetails, $encoded);
+        self::assertStringNotContainsString($rawBody, $encoded);
     }
 
     private function call(EmailValidationController $controller, array $body): Response
