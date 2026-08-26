@@ -33,7 +33,41 @@ final class ModuleTest extends Unit
         self::assertSame('emailsvalidator/api/email-validation/index', $query['r'] ?? null);
     }
 
-    private function application(bool $enablePrettyUrl, bool $showScriptName, string $scriptUrl = '/index.php'): Application
+    public function testApiBasePathProducesUsableUrlsAcrossUrlManagerModes(): void
+    {
+        $cases = [
+            [true, true, '/admin/app.php', '', '/admin/app.php/emailsvalidator/api/v1/email-validations'],
+            [true, false, '/admin/app.php', '', '/emailsvalidator/api/v1/email-validations'],
+            [true, true, '/admin/app.php', '.html', '/admin/app.php/emailsvalidator/api/v1/email-validations.html'],
+            [true, false, '/admin/app.php', '.html', '/emailsvalidator/api/v1/email-validations.html'],
+            [false, true, '/admin/app.php', '', '/admin/app.php'],
+            [false, false, '/admin/app.php', '', '/admin/app.php'],
+            [false, true, '/admin/app.php', '.html', '/admin/app.php'],
+            [false, false, '/admin/app.php', '.html', '/admin/app.php'],
+        ];
+
+        foreach ($cases as [$pretty, $showScriptName, $scriptUrl, $suffix, $expectedPath]) {
+            $application = $this->application($pretty, $showScriptName, $scriptUrl, $suffix);
+            $url = $application->getModule('emailsvalidator')->apiBasePath();
+
+            self::assertSame($expectedPath, parse_url($url, PHP_URL_PATH));
+            if ($pretty) {
+                self::assertNull(parse_url($url, PHP_URL_QUERY));
+                continue;
+            }
+
+            $query = [];
+            parse_str((string) parse_url($url, PHP_URL_QUERY), $query);
+            self::assertSame('emailsvalidator/api/email-validation/index', $query['r'] ?? null);
+        }
+    }
+
+    private function application(
+        bool $enablePrettyUrl,
+        bool $showScriptName,
+        string $scriptUrl = '/index.php',
+        string $suffix = '',
+    ): Application
     {
         $application = new Application([
             'id' => 'emails-validator-module-api-base-test',
@@ -47,6 +81,7 @@ final class ModuleTest extends Unit
                     'class' => UrlManager::class,
                     'enablePrettyUrl' => $enablePrettyUrl,
                     'showScriptName' => $showScriptName,
+                    'suffix' => $suffix,
                 ],
             ],
         ]);

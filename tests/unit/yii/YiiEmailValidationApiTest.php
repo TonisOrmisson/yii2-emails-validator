@@ -116,6 +116,38 @@ final class YiiEmailValidationApiTest extends Unit
         self::assertFalse($app->urlManager->parseRequest($app->request));
     }
 
+    public function testStringModuleClassBootstrapRegistersItsPrefixedPostApiRoute(): void
+    {
+        $app = new Application([
+            'id' => 'emails-validator-string-module-bootstrap-test',
+            'basePath' => dirname(__DIR__, 3),
+            'modules' => [
+                'emailsvalidator' => Module::class,
+            ],
+            'components' => [
+                'request' => ['cookieValidationKey' => 'emails-validator-string-module-bootstrap-test'],
+                'urlManager' => [
+                    'class' => UrlManager::class,
+                    'enablePrettyUrl' => true,
+                    'enableStrictParsing' => true,
+                    'showScriptName' => false,
+                ],
+            ],
+        ]);
+
+        (new Bootstrap())->bootstrap($app);
+
+        $app->set('request', Stub::make(Request::class, [
+            'getMethod' => 'POST',
+            'getPathInfo' => 'emailsvalidator/api/v1/email-validations',
+        ]));
+
+        self::assertSame(
+            ['emailsvalidator/api/email-validation/index', []],
+            $app->urlManager->parseRequest($app->request),
+        );
+    }
+
     public function testApiControllerUsesConfiguredPermissionPostOnlyAndKeepsCsrfEnabled(): void
     {
         $this->assertControllerAvailable();
