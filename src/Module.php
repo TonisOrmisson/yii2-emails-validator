@@ -27,7 +27,12 @@ class Module extends \yii\base\Module
 
     public function apiBasePath(): string
     {
-        return rtrim(Yii::$app->request->getBaseUrl(), '/') . '/' . $this->getUniqueId() . '/api/v1/email-validations';
+        $urlManager = Yii::$app->getUrlManager();
+        $route = $urlManager->enablePrettyUrl
+            ? $this->getUniqueId() . '/api/v1/email-validations'
+            : $this->getUniqueId() . '/api/email-validation/index';
+
+        return $urlManager->createUrl([$route]);
     }
 
     /** @return array<string, string> */
