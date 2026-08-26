@@ -139,6 +139,30 @@ final class LaravelEmailValidationApiTest extends Unit
         self::assertArrayHasKey('textInput', $overLimit->getData(true)['errors']);
     }
 
+    public function testControllerReturnsGenericRequestErrorForMalformedRawJson(): void
+    {
+        $response = $this->callRawController('{"textInput":"good@example.com",');
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertSame([
+            'errors' => [
+                'request' => ['The request body must be a valid JSON object.'],
+            ],
+        ], $response->getData(true));
+    }
+
+    public function testControllerReturnsGenericRequestErrorForAJsonArrayBody(): void
+    {
+        $response = $this->callRawController('["good@example.com"]');
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertSame([
+            'errors' => [
+                'request' => ['The request body must be a valid JSON object.'],
+            ],
+        ], $response->getData(true));
+    }
+
     public function testLaravelResponseMatchesTheYiiResponseForTheSamePayload(): void
     {
         $payload = [
@@ -246,6 +270,14 @@ final class LaravelEmailValidationApiTest extends Unit
 
     private function callController(array $payload, string $query = ''): JsonResponse
     {
+        return $this->callRawController(
+            json_encode($payload, JSON_THROW_ON_ERROR),
+            $query,
+        );
+    }
+
+    private function callRawController(string $body, string $query = ''): JsonResponse
+    {
         $request = Request::create(
             '/api/v1/email-validations' . $query,
             'POST',
@@ -253,7 +285,7 @@ final class LaravelEmailValidationApiTest extends Unit
             [],
             [],
             ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json'],
-            json_encode($payload, JSON_THROW_ON_ERROR),
+            $body,
         );
 
         return (new EmailValidationController(

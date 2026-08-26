@@ -13,6 +13,7 @@ use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\IdentityInterface;
 use yii\web\MethodNotAllowedHttpException;
+use yii\web\JsonParser;
 use yii\web\Application;
 use yii\web\Request;
 use yii\web\Response;
@@ -160,6 +161,39 @@ final class YiiEmailValidationApiTest extends Unit
         self::assertSame(422, $invalid->statusCode);
         self::assertArrayHasKey('textInput', $invalid->data['errors']);
         self::assertStringNotContainsString('Exception', json_encode($invalid->data));
+    }
+
+    public function testControllerAcceptsAStdClassReturnedByTheJsonParser(): void
+    {
+        $this->assertControllerAvailable();
+        $module = \Yii::$app->getModule('emailsvalidator');
+        $module->accessPermissionName = 'configured.email.permission';
+        $controller = new EmailValidationController('email-validation', $module);
+        $payload = [
+            'textInput' => 'good@example.com',
+            'checkDNS' => false,
+            'checkSpoof' => false,
+            'displayOnlyProblems' => false,
+        ];
+        $parser = new JsonParser();
+        $parser->asArray = false;
+        $parsed = $parser->parse(
+            json_encode($payload, JSON_THROW_ON_ERROR),
+            'application/json',
+        );
+        self::assertInstanceOf(\stdClass::class, $parsed);
+
+        \Yii::$app->set('request', Stub::make(Request::class, [
+            'getIsPost' => true,
+            'getMethod' => 'POST',
+            'getBodyParams' => $parsed,
+        ]));
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $response = $controller->actionIndex();
+
+        self::assertSame(200, $response->statusCode);
+        self::assertSame(1, $response->data['meta']['total']);
     }
 
     public function testJsonBodyIsUsedWhenParsedBodyIsEmptyAndMalformedJsonStaysGeneric(): void
