@@ -1,0 +1,100 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "EmailsValidator API",
+    "version": "1.0.0",
+    "description": "Stateless e-mail address validation."
+  },
+  "paths": {
+    "/api/v1/email-validations": {
+      "post": {
+        "operationId": "validateEmailAddresses",
+        "security": [{"cookieAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/EmailValidationRequest"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Validation completed.",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/EmailValidationResponse"}
+              }
+            }
+          },
+          "422": {
+            "description": "The request is invalid.",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/EmailValidationErrorResponse"}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {"type": "apiKey", "in": "cookie", "name": "Cookie"}
+    },
+    "schemas": {
+      "EmailValidationRequest": {
+        "type": "object",
+        "required": ["textInput", "checkDNS", "checkSpoof", "displayOnlyProblems"],
+        "properties": {
+          "textInput": {"type": "string", "minLength": 1, "maxLength": 131072},
+          "checkDNS": {"type": "boolean", "default": true},
+          "checkSpoof": {"type": "boolean", "default": true},
+          "displayOnlyProblems": {"type": "boolean", "default": true}
+        },
+        "additionalProperties": false
+      },
+      "EmailValidationResult": {
+        "type": "object",
+        "required": ["address", "needs_trimming", "is_valid", "is_valid_rfc", "is_no_rfc_warnings", "is_valid_dns", "is_valid_spoof_check"],
+        "properties": {
+          "address": {"type": "string"},
+          "needs_trimming": {"type": "boolean"},
+          "is_valid": {"type": "boolean"},
+          "is_valid_rfc": {"type": "boolean"},
+          "is_no_rfc_warnings": {"type": "boolean"},
+          "is_valid_dns": {"type": "boolean"},
+          "is_valid_spoof_check": {"type": "boolean"}
+        },
+        "additionalProperties": false
+      },
+      "EmailValidationResponse": {
+        "type": "object",
+        "required": ["data", "meta"],
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/EmailValidationResult"}},
+          "meta": {
+            "type": "object",
+            "required": ["total", "failed", "display_only_problems"],
+            "properties": {
+              "total": {"type": "integer", "minimum": 0},
+              "failed": {"type": "integer", "minimum": 0},
+              "display_only_problems": {"type": "boolean"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "EmailValidationErrorResponse": {
+        "type": "object",
+        "required": ["errors"],
+        "properties": {
+          "errors": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}}
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

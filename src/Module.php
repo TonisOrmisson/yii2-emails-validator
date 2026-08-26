@@ -1,37 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
 namespace andmemasin\emailsvalidator;
 
+use andmemasin\emailsvalidator\validation\EmailValidationService;
 use Yii;
-
 
 class Module extends \yii\base\Module
 {
-    /** @var string  */
     public $accessPermissionName = 'access::emailsValidator';
-
-    public $controllerNamespace = 'andmemasin\emailsvalidator\controllers';
-
+    public $controllerNamespace = 'andmemasin\\emailsvalidator\\controllers';
     public $defaultRoute = 'site/index';
-
-    /** @var int $maxInputKB Limit the input string to KB (default = 128) */
+    /** @var int Limit input to this many kilobytes. */
     public $maxInputKB = 128;
-
-    /** @var boolean $displayFlashMessages whether the flash messages will be rendered ny the module. You can disable this if your app has a separate flash displaying system.  */
     public $displayFlashMessages = true;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
         if (Yii::$app instanceof \yii\console\Application) {
-            $this->controllerNamespace = 'andmemasin\emailsvalidator\commands';
+            $this->controllerNamespace = 'andmemasin\\emailsvalidator\\commands';
         }
     }
 
+    /** @return array<string, string> */
+    public static function apiRouteRules(): array
+    {
+        return ['POST api/v1/email-validations' => 'emailsvalidator/api/email-validation/index'];
+    }
 
+    public function getValidationService(): EmailValidationService
+    {
+        if (!is_int($this->maxInputKB) || $this->maxInputKB <= 0) {
+            throw new \InvalidArgumentException('The maximum input KB must be positive.');
+        }
 
+        return new EmailValidationService($this->maxInputKB * 1024);
+    }
 }

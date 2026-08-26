@@ -1,100 +1,90 @@
 <?php
 
+declare(strict_types=1);
+
 namespace andmemasin\emailsvalidator\models;
 
 use andmemasin\emailsvalidator\Module;
+use andmemasin\emailsvalidator\validation\EmailValidationRequest;
 use yii\base\Model;
 use Yii;
 
 class EmailsValidationForm extends Model
 {
-    //TODO find me a better name!
-    /** @var  string */
     public $textInput;
-
-    /** @var  Module */
+    /** @var Module */
     public $module;
-
-    /** @var  EmailAddress[] $emailAddresses */
     public $emailAddresses = [];
-
-    /** @var  EmailAddress[] $failingEmailAddresses */
     public $failingEmailAddresses = [];
-
-    /** @var  boolean */
     public $checkDNS = true;
-
-    /** @var  boolean */
     public $checkSpoof = true;
-
-    /** @var  boolean  */
     public $displayOnlyProblems = true;
-
-    /** @var  array Array of already checked domains */
     public $checkedDomains = [];
 
-    public function init()
+    public function init(): void
     {
-        $this->module = \Yii::$app->getModule('emailsvalidator');
+        $this->module = Yii::$app->getModule('emailsvalidator');
         parent::init();
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             [['textInput'], 'required'],
             [['textInput'], 'string', 'max' => 1024 * $this->module->maxInputKB],
-            [['checkDNS','checkSpoof','displayOnlyProblems'],'boolean'],
+            [['checkDNS', 'checkSpoof', 'displayOnlyProblems'], 'boolean'],
         ];
     }
 
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
-            'textInput'=>Yii::t('app','E-mail addresses'),
-            'checkDNS'=>Yii::t('app','Perform DNS check'),
-            'checkSpoof'=>Yii::t('app','Perform spoofing check'),
-            'displayOnlyProblems'=>Yii::t('app','Display only e-mails with problems in results'),
+            'textInput' => Yii::t('app', 'E-mail addresses'),
+            'checkDNS' => Yii::t('app', 'Perform DNS check'),
+            'checkSpoof' => Yii::t('app', 'Perform spoofing check'),
+            'displayOnlyProblems' => Yii::t('app', 'Display only e-mails with problems in results'),
         ];
     }
 
-    public function attributeHints()
+    public function attributeHints(): array
     {
         return [
-            'textInput'=>Yii::t('app','One e-mail address per line'),
-            'checkDNS'=>Yii::t('app','Checking DNS will increase processing time'),
+            'textInput' => Yii::t('app', 'One e-mail address per line'),
+            'checkDNS' => Yii::t('app', 'Checking DNS will increase processing time'),
         ];
     }
 
-    public function process(){
+    public function process(): bool
+    {
         $this->loadEmailAddresses();
         return true;
     }
 
-    private function loadEmailAddresses(){
-        if($this->textInput){
-            $pattern = '/\r\n|[\r\n]/';
-            $array = preg_split( $pattern, $this->textInput );
-            if(!empty($array)){
-                foreach ($array as $address){
-                    if($address){
-                        $model = new EmailAddress([
-                            'address'=>$address,
-                            'checkDNS'=>$this->checkDNS,
-                            'checkSpoof'=>$this->checkSpoof,
-                        ]);
+    private function loadEmailAddresses(): void
+    {
+        $this->emailAddresses = [];
+        $this->failingEmailAddresses = [];
+        if (!$this->textInput) {
+            return;
+        }
 
-                        $this->emailAddresses[] = $model;
-                        if(!$model->isValid){
-                            $this->failingEmailAddresses[] = $model;
-                        }
+        $report = $this->module->getValidationService()->validate(new EmailValidationRequest(
+            $this->textInput,
+            (bool) $this->checkDNS,
+            (bool) $this->checkSpoof,
+            (bool) $this->displayOnlyProblems,
+        ));
 
-                    }
-                }
+        foreach ($report->results as $result) {
+            $model = new EmailAddress([
+                'address' => $result->address,
+                'checkDNS' => $this->checkDNS,
+                'checkSpoof' => $this->checkSpoof,
+            ]);
+            $this->emailAddresses[] = $model;
+            if (!$model->isValid) {
+                $this->failingEmailAddresses[] = $model;
             }
         }
     }
-
-
-
 }

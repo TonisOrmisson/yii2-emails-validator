@@ -29,7 +29,12 @@
     "codeception/module-db": "^3.0",
     "infection/codeception-adapter": "^0.4.7",
     "infection/infection": "^0.34",
-    "phpstan/phpstan": "^1.8"
+    "phpstan/phpstan": "^1.8",
+    "illuminate/container": "^11.0|^12.0",
+    "illuminate/http": "^11.0|^12.0",
+    "illuminate/routing": "^11.0|^12.0",
+    "illuminate/support": "^11.0|^12.0",
+    "illuminate/view": "^11.0|^12.0"
   },
   "config": {
     "platform": {
@@ -43,6 +48,10 @@
       "infection/extension-installer": true,
       "yiisoft/yii2-composer": true
     }
+  },
+  "suggest": {
+    "illuminate/container": "Required only when using the optional Laravel adapter.",
+    "illuminate/routing": "Required only when using the optional Laravel adapter."
   },
   "extra": {
     "branch-alias": {
