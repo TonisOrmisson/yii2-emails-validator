@@ -22,8 +22,8 @@ final class EmailValidationController
     public function __invoke(Request $request): JsonResponse
     {
         try {
-            $payload = $request->json()->all();
-            $validationRequest = EmailValidationRequest::fromArray(is_array($payload) ? $payload : []);
+            $payload = $this->decodeJsonObject($request->getContent());
+            $validationRequest = EmailValidationRequest::fromArray($payload);
             $response = $this->responder->success(
                 $this->service->validate($validationRequest),
                 $validationRequest->displayOnlyProblems,
@@ -33,5 +33,23 @@ final class EmailValidationController
         }
 
         return new JsonResponse($response['body'], $response['status']);
+    }
+
+    /** @return array<string, mixed> */
+    private function decodeJsonObject(string $body): array
+    {
+        try {
+            $decoded = json_decode($body, false, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            $decoded = null;
+        }
+
+        if (!$decoded instanceof \stdClass) {
+            throw new EmailValidationException([
+                'request' => ['The request body must be a valid JSON object.'],
+            ]);
+        }
+
+        return (array) $decoded;
     }
 }
