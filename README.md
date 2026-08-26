@@ -14,12 +14,17 @@ and direct POST rendering remain available. GET renders the accessible native
 `<emails-validator>` component; POST remains the server-rendered compatibility
 path.
 
-Merge `andmemasin\\emailsvalidator\\Module::apiRouteRules()` into the
-application URL rules. It registers only the protected POST endpoint:
+The package Composer bootstrap automatically registers one protected POST
+endpoint:
 
 ```
-POST /api/v1/email-validations
+POST /emailsvalidator/api/v1/email-validations
 ```
+
+Hosts that load the source directly, such as the dev app, must instead merge
+`andmemasin\\emailsvalidator\\Module::apiRouteRules()` into their application
+URL rules. This registers the same endpoint; do not register an additional
+unprefixed Yii route.
 
 The endpoint accepts `textInput`, `checkDNS`, `checkSpoof`, and
 `displayOnlyProblems`, and returns the documented `200` result or `422`
@@ -47,5 +52,6 @@ package route file and render the Blade view with non-empty `apiBase`,
 `csrfToken`, and `assetBase` values. The host must serve the build-free files
 in `resources/ui` (the package has no npm or frontend build step).
 
-The module is stateless and has no one-writer rule: **not applicable: this
-module writes nothing**.
+The Laravel adapter keeps its existing protected `POST /api/v1/email-validations`
+route. The module is stateless and has no one-writer rule: **not applicable:
+this module writes nothing**.

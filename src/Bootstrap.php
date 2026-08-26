@@ -20,11 +20,6 @@ final class Bootstrap implements BootstrapInterface
             if ($definition instanceof Module || (is_string($class) && is_a($class, Module::class, true))) {
                 $rules = Module::apiRouteRules((string) $id);
                 $app->urlManager->addRules($rules, false);
-                foreach ($rules as $rule => $target) {
-                    $app->urlManager->addRules([
-                        preg_replace('/^POST /', 'GET ', $rule) => $target,
-                    ], false);
-                }
             }
         }
     }
