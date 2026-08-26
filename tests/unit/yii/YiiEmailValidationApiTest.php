@@ -272,6 +272,16 @@ final class YiiEmailValidationApiTest extends Unit
         self::assertSame(1, $response->data['meta']['total']);
     }
 
+    public function testMalformedJsonWithMissingCsrfIsRejectedAsGenericCsrfError(): void
+    {
+        $this->assertMalformedJsonWithCsrfHeaderIsRejected(null);
+    }
+
+    public function testMalformedJsonWithInvalidCsrfIsRejectedAsGenericCsrfError(): void
+    {
+        $this->assertMalformedJsonWithCsrfHeaderIsRejected('invalid-token');
+    }
+
     public function testAuthorizedPostWithParserFailureIsNormalizedByTheRequestPipeline(): void
     {
         $this->configureAccess(true);
@@ -322,6 +332,44 @@ final class YiiEmailValidationApiTest extends Unit
         self::assertIsString($encoded);
         self::assertStringNotContainsString($parserDetails, $encoded);
         self::assertStringNotContainsString($rawBody, $encoded);
+    }
+
+    private function assertMalformedJsonWithCsrfHeaderIsRejected(?string $csrfHeader): void
+    {
+        $this->configureAccess(true);
+        $parserDetails = 'configured parser detail: malformed JSON';
+        $rawBody = '{"textInput":"parser-secret",';
+        $serverToken = \Yii::$app->security->maskToken(hash('sha256', 'server-token'));
+        $csrfToken = $csrfHeader === null
+            ? null
+            : \Yii::$app->security->maskToken(hash('sha256', $csrfHeader));
+
+        \Yii::$app->set('request', Stub::construct(Request::class, [], [
+            'getIsPost' => true,
+            'getMethod' => 'POST',
+            'getUserIP' => '127.0.0.1',
+            'getBodyParams' => static function () use ($parserDetails): array {
+                throw new BadRequestHttpException($parserDetails);
+            },
+            'getCsrfToken' => $serverToken,
+            'getCsrfTokenFromHeader' => $csrfToken,
+            'getRawBody' => $rawBody,
+            'getContentType' => 'application/json',
+        ]));
+        $controller = $this->controller();
+
+        $exception = null;
+        try {
+            $controller->runAction('index');
+            self::fail('Malformed JSON with an invalid CSRF token must be rejected.');
+        } catch (BadRequestHttpException $caught) {
+            $exception = $caught;
+        }
+
+        self::assertInstanceOf(BadRequestHttpException::class, $exception);
+        self::assertSame('Unable to verify your data submission.', $exception?->getMessage());
+        self::assertStringNotContainsString($parserDetails, $exception?->getMessage() ?? '');
+        self::assertStringNotContainsString($rawBody, $exception?->getMessage() ?? '');
     }
 
     private function call(EmailValidationController $controller, array $body): Response
