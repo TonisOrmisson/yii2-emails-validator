@@ -40,6 +40,20 @@ final class EmailValidationController extends Controller
         ];
     }
 
+    public function beforeAction($action): bool
+    {
+        try {
+            return parent::beforeAction($action);
+        } catch (BadRequestHttpException $exception) {
+            if (!$this->hasValidCsrfHeader()) {
+                throw $exception;
+            }
+
+            $this->setInvalidJsonResponse();
+            return false;
+        }
+    }
+
     public function actionIndex(): Response
     {
         $response = Yii::$app->response;
@@ -70,6 +84,26 @@ final class EmailValidationController extends Controller
         $response->statusCode = $payload['status'];
         $response->data = $payload['body'];
         return $response;
+    }
+
+    private function hasValidCsrfHeader(): bool
+    {
+        $request = Yii::$app->request;
+        $token = $request->getCsrfTokenFromHeader();
+
+        return $token !== null && $request->validateCsrfToken($token);
+    }
+
+    private function setInvalidJsonResponse(): void
+    {
+        $response = Yii::$app->response;
+        $response->format = Response::FORMAT_JSON;
+        $response->statusCode = 422;
+        $response->data = [
+            'errors' => [
+                'request' => ['The request body must be a valid JSON object.'],
+            ],
+        ];
     }
 
     /** @return array<string, mixed> */
