@@ -37,6 +37,17 @@ class EmailsValidationFormTest extends \Codeception\Test\Unit
         $this->assertEquals(true, $this->model->process());
     }
 
+    public function testProcessSkipsZeroLineWithoutLegacyError(): void
+    {
+        $this->model->textInput = "good@example.com\n0";
+        $this->model->checkDNS = false;
+        $this->model->checkSpoof = false;
+
+        $this->assertTrue($this->model->process());
+        $this->assertCount(1, $this->model->emailAddresses);
+        $this->assertSame('good@example.com', $this->model->emailAddresses[0]->address);
+    }
+
     public function testProcessWithChecksDisabledPreservesInputAndFailureSubset(): void
     {
         $this->model->textInput = "good@example.com\r\n\r\n bad@example.com\nnot-an-email";

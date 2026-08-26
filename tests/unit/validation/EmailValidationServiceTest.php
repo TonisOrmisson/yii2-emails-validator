@@ -82,6 +82,22 @@ final class EmailValidationServiceTest extends Unit
         }
     }
 
+    public function testInputLimitUsesUtf8ByteLength(): void
+    {
+        $service = new EmailValidationService(4);
+        $report = $service->validate($this->request('ää', false, false, false));
+
+        self::assertCount(1, $report->results);
+        self::assertSame('ää', $report->results[0]->address);
+
+        try {
+            $service->validate($this->request('äää', false, false, false));
+            self::fail('Input exceeding the byte limit was accepted.');
+        } catch (EmailValidationException $exception) {
+            self::assertSame(['textInput'], array_keys($exception->errors()));
+        }
+    }
+
     public function testInputBoundaryRejectsUnknownPropertiesAsFieldErrors(): void
     {
         $payload = [
