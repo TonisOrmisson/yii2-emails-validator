@@ -24,7 +24,9 @@ final readonly class EmailValidationRequest
         }
 
         foreach (['checkDNS', 'checkSpoof', 'displayOnlyProblems'] as $field) {
-            if (array_key_exists($field, $payload) && !is_bool($payload[$field])) {
+            if (!array_key_exists($field, $payload)) {
+                $errors[$field] = ['This field is required.'];
+            } elseif (!is_bool($payload[$field])) {
                 $errors[$field] = ['The value must be a boolean.'];
             }
         }
@@ -35,9 +37,9 @@ final readonly class EmailValidationRequest
 
         return new self(
             $payload['textInput'],
-            $payload['checkDNS'] ?? true,
-            $payload['checkSpoof'] ?? true,
-            $payload['displayOnlyProblems'] ?? true,
+            $payload['checkDNS'],
+            $payload['checkSpoof'],
+            $payload['displayOnlyProblems'],
         );
     }
 }

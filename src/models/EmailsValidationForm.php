@@ -76,11 +76,11 @@ class EmailsValidationForm extends Model
         ));
 
         foreach ($report->results as $result) {
-            $model = new EmailAddress([
-                'address' => $result->address,
-                'checkDNS' => $this->checkDNS,
-                'checkSpoof' => $this->checkSpoof,
-            ]);
+            $model = EmailAddress::fromValidationResult(
+                $result,
+                (bool) $this->checkDNS,
+                (bool) $this->checkSpoof,
+            );
             $this->emailAddresses[] = $model;
             if (!$model->isValid) {
                 $this->failingEmailAddresses[] = $model;

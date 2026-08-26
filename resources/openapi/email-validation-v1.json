@@ -41,7 +41,7 @@
   },
   "components": {
     "securitySchemes": {
-      "cookieAuth": {"type": "apiKey", "in": "cookie", "name": "Cookie"}
+      "cookieAuth": {"type": "apiKey", "in": "header", "name": "Cookie"}
     },
     "schemas": {
       "EmailValidationRequest": {

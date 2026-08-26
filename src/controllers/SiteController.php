@@ -6,6 +6,7 @@ namespace andmemasin\emailsvalidator\controllers;
 
 use andmemasin\emailsvalidator\Module;
 use andmemasin\emailsvalidator\models\EmailsValidationForm;
+use andmemasin\emailsvalidator\validation\EmailValidationException;
 use Yii;
 use yii\data\ArrayDataProvider;
 use yii\filters\AccessControl;
@@ -47,28 +48,34 @@ class SiteController extends Controller
         $model = new EmailsValidationForm();
         $dataProvider = null;
 
-        if ($model->load(Yii::$app->request->post()) && $model->process()) {
-            $dataProvider = new ArrayDataProvider([
-                'allModels' => $model->displayOnlyProblems
-                    ? $model->failingEmailAddresses
-                    : $model->emailAddresses,
-                'pagination' => ['pageSize' => count($model->emailAddresses)],
-            ]);
-            $formatter = new Formatter();
+        if ($model->load(Yii::$app->request->post())) {
+            try {
+                if ($model->process()) {
+                    $dataProvider = new ArrayDataProvider([
+                        'allModels' => $model->displayOnlyProblems
+                            ? $model->failingEmailAddresses
+                            : $model->emailAddresses,
+                        'pagination' => ['pageSize' => count($model->emailAddresses)],
+                    ]);
+                    $formatter = new Formatter();
 
-            if ($model->failingEmailAddresses !== []) {
-                Yii::$app->session->addFlash('danger', Yii::t('app',
-                    'There were {count} e-mail addresses that failed validation!',
-                    ['count' => count($model->failingEmailAddresses)],
-                ));
+                    if ($model->failingEmailAddresses !== []) {
+                        Yii::$app->session->addFlash('danger', Yii::t('app',
+                            'There were {count} e-mail addresses that failed validation!',
+                            ['count' => count($model->failingEmailAddresses)],
+                        ));
+                    }
+                    Yii::$app->session->addFlash('success', Yii::t('app',
+                        'Checked {count} e-mails in {duration}!',
+                        [
+                            'count' => count($model->emailAddresses),
+                            'duration' => $formatter->asDuration((int) Yii::getLogger()->getElapsedTime()),
+                        ],
+                    ));
+                }
+            } catch (EmailValidationException $exception) {
+                $model->addErrors($exception->errors());
             }
-            Yii::$app->session->addFlash('success', Yii::t('app',
-                'Checked {count} e-mails in {duration}!',
-                [
-                    'count' => count($model->emailAddresses),
-                    'duration' => $formatter->asDuration((int) Yii::getLogger()->getElapsedTime()),
-                ],
-            ));
         }
 
         return $this->render('index', [

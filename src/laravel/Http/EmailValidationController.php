@@ -22,7 +22,7 @@ final class EmailValidationController
     public function __invoke(Request $request): JsonResponse
     {
         try {
-            $payload = $request->all();
+            $payload = $request->json()->all();
             $validationRequest = EmailValidationRequest::fromArray(is_array($payload) ? $payload : []);
             $response = $this->responder->success(
                 $this->service->validate($validationRequest),
