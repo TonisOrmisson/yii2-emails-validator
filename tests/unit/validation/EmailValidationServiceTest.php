@@ -55,13 +55,13 @@ final class EmailValidationServiceTest extends Unit
         $this->assertValidationClassesAvailable();
 
         foreach ([
-            [[], ['textInput']],
-            [['textInput' => ''], ['textInput']],
-            [['textInput' => null], ['textInput']],
-            [['textInput' => 123], ['textInput']],
-            [['textInput' => 'good@example.com', 'checkDNS' => 'yes'], ['checkDNS']],
-            [['textInput' => 'good@example.com', 'checkSpoof' => 1], ['checkSpoof']],
-            [['textInput' => 'good@example.com', 'displayOnlyProblems' => 0], ['displayOnlyProblems']],
+            [[], ['textInput', 'checkDNS', 'checkSpoof', 'displayOnlyProblems']],
+            [['textInput' => ''], ['textInput', 'checkDNS', 'checkSpoof', 'displayOnlyProblems']],
+            [['textInput' => null], ['textInput', 'checkDNS', 'checkSpoof', 'displayOnlyProblems']],
+            [['textInput' => 123], ['textInput', 'checkDNS', 'checkSpoof', 'displayOnlyProblems']],
+            [['textInput' => 'good@example.com', 'checkDNS' => 'yes'], ['checkDNS', 'checkSpoof', 'displayOnlyProblems']],
+            [['textInput' => 'good@example.com', 'checkSpoof' => 1], ['checkDNS', 'checkSpoof', 'displayOnlyProblems']],
+            [['textInput' => 'good@example.com', 'displayOnlyProblems' => 0], ['checkDNS', 'checkSpoof', 'displayOnlyProblems']],
         ] as [$payload, $fields]) {
             try {
                 EmailValidationRequest::fromArray($payload);

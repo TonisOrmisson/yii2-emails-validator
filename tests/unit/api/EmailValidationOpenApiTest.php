@@ -44,7 +44,7 @@ final class EmailValidationOpenApiTest extends Unit
 
         $securitySchemes = $document['components']['securitySchemes'];
         self::assertSame('apiKey', $securitySchemes['cookieAuth']['type']);
-        self::assertSame('cookie', $securitySchemes['cookieAuth']['in']);
+        self::assertSame('header', $securitySchemes['cookieAuth']['in']);
         self::assertSame('Cookie', $securitySchemes['cookieAuth']['name']);
     }
 }
