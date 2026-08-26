@@ -11,6 +11,7 @@ use andmemasin\emailsvalidator\validation\EmailValidationRequest;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\Response;
 
@@ -46,7 +47,13 @@ final class EmailValidationController extends Controller
         $responder = new EmailValidationApiResponder();
 
         try {
-            $body = Yii::$app->request->getBodyParams();
+            try {
+                $body = Yii::$app->request->getBodyParams();
+            } catch (BadRequestHttpException) {
+                throw new EmailValidationException([
+                    'request' => ['The request body must be a valid JSON object.'],
+                ]);
+            }
             if ($body === [] && str_starts_with(
                 strtolower((string) Yii::$app->request->getContentType()),
                 'application/json',
