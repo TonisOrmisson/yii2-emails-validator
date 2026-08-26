@@ -41,17 +41,12 @@ final class EmailValidationService
         $errors = [];
         if ($request->textInput === '') {
             $errors['textInput'] = ['The e-mail input is required.'];
-        } elseif ($this->length($request->textInput) > $this->maxInputLength) {
+        } elseif (strlen($request->textInput) > $this->maxInputLength) {
             $errors['textInput'] = ['The e-mail input is too long.'];
         }
         if ($errors !== []) {
             throw new EmailValidationException($errors);
         }
-    }
-
-    private function length(string $value): int
-    {
-        return function_exists('mb_strlen') ? mb_strlen($value, 'UTF-8') : strlen($value);
     }
 
     private function validateAddress(string $address, bool $checkDNS, bool $checkSpoof): EmailValidationResult

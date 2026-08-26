@@ -78,6 +78,10 @@ class EmailsValidationForm extends Model
         ));
 
         foreach ($report->results as $result) {
+            if ($result->address === '0') {
+                continue;
+            }
+
             $model = EmailAddress::fromValidationResult(
                 $result,
                 (bool) $this->checkDNS,
