@@ -48,7 +48,7 @@ class EmailAddress extends Model
 
     public function init(): void
     {
-        if (!is_string($this->address) || $this->address === '') {
+        if (!is_string($this->address) || empty($this->address)) {
             throw new \ErrorException('need an address here!');
         }
         parent::init();
