@@ -82,6 +82,24 @@ final class EmailValidationServiceTest extends Unit
         }
     }
 
+    public function testInputBoundaryRejectsUnknownPropertiesAsFieldErrors(): void
+    {
+        $payload = [
+            'textInput' => 'good@example.com',
+            'checkDNS' => false,
+            'checkSpoof' => false,
+            'displayOnlyProblems' => false,
+            'unknown' => 'not-allowed',
+        ];
+
+        try {
+            EmailValidationRequest::fromArray($payload);
+            self::fail('Unknown input properties must be rejected.');
+        } catch (EmailValidationException $exception) {
+            self::assertSame(['unknown'], array_keys($exception->errors()));
+        }
+    }
+
     public function testServiceHasNoFrameworkDependency(): void
     {
         $this->assertValidationClassesAvailable();

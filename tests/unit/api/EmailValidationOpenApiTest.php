@@ -15,6 +15,15 @@ final class EmailValidationOpenApiTest extends Unit
 
         $document = json_decode((string) file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
         self::assertSame('3.1.0', $document['openapi']);
+        $servers = array_column($document['servers'] ?? [], 'url');
+        self::assertContains('/', $servers);
+        self::assertContains('/emailsvalidator', $servers);
+        $serverRoutes = array_map(
+            static fn (string $server): string => rtrim($server, '/') . '/api/v1/email-validations',
+            $servers,
+        );
+        self::assertContains('/api/v1/email-validations', $serverRoutes);
+        self::assertContains('/emailsvalidator/api/v1/email-validations', $serverRoutes);
         self::assertArrayHasKey('/api/v1/email-validations', $document['paths']);
         self::assertCount(1, $document['paths']);
 
