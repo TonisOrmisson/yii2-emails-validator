@@ -98,11 +98,20 @@ final class YiiEmailValidationApiTest extends Unit
         self::assertTrue(class_exists(Bootstrap::class), 'EmailsValidator Yii bootstrap is missing.');
         (new Bootstrap())->bootstrap($app);
 
-        $app->request->setPathInfo('custom-emails/api/v1/email-validations');
+        $app->set('request', Stub::make(Request::class, [
+            'getMethod' => 'POST',
+            'getPathInfo' => 'custom-emails/api/v1/email-validations',
+        ]));
         self::assertSame(
             ['custom-emails/api/email-validation/index', []],
             $app->urlManager->parseRequest($app->request),
         );
+
+        $app->set('request', Stub::make(Request::class, [
+            'getMethod' => 'GET',
+            'getPathInfo' => 'custom-emails/api/v1/email-validations',
+        ]));
+        self::assertFalse($app->urlManager->parseRequest($app->request));
     }
 
     public function testApiControllerUsesConfiguredPermissionPostOnlyAndKeepsCsrfEnabled(): void
