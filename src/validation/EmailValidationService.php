@@ -70,7 +70,7 @@ final class EmailValidationService
         return new EmailValidationResult(
             $address,
             $trimming,
-            $rfc && $warnings && $dns && $spoof,
+            !$trimming && $rfc && $warnings && $dns && $spoof,
             $rfc,
             $warnings,
             $dns,
