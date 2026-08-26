@@ -1,0 +1,147 @@
+<?php
+
+declare(strict_types=1);
+
+namespace andmemasin\emailsvalidator\controllers\api;
+
+use andmemasin\emailsvalidator\Module;
+use andmemasin\emailsvalidator\api\EmailValidationApiResponder;
+use andmemasin\emailsvalidator\validation\EmailValidationException;
+use andmemasin\emailsvalidator\validation\EmailValidationRequest;
+use Yii;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
+use yii\web\BadRequestHttpException;
+use yii\web\Controller;
+use yii\web\Response;
+
+final class EmailValidationController extends Controller
+{
+    public $enableCsrfValidation = true;
+
+    public function behaviors(): array
+    {
+        /** @var Module $module */
+        $module = $this->module;
+
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [[
+                    'actions' => ['index'],
+                    'allow' => true,
+                    'roles' => [$module->accessPermissionName],
+                ]],
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => ['index' => ['POST']],
+            ],
+        ];
+    }
+
+    public function beforeAction($action): bool
+    {
+        try {
+            return parent::beforeAction($action);
+        } catch (BadRequestHttpException) {
+            if (!$this->hasValidCsrfHeader()) {
+                throw new BadRequestHttpException('Unable to verify your data submission.');
+            }
+
+            $this->setInvalidJsonResponse();
+            return false;
+        }
+    }
+
+    public function actionIndex(): Response
+    {
+        $response = Yii::$app->response;
+        $response->format = Response::FORMAT_JSON;
+        $responder = new EmailValidationApiResponder();
+
+        try {
+            $httpRequest = Yii::$app->request;
+            $rawBody = $httpRequest->getRawBody();
+            $isJsonRequest = str_starts_with(
+                strtolower((string) $httpRequest->getContentType()),
+                'application/json',
+            );
+
+            if ($isJsonRequest && $rawBody !== '') {
+                $body = $this->decodeJsonBody($rawBody);
+            } else {
+                try {
+                    $body = $httpRequest->getBodyParams();
+                } catch (BadRequestHttpException) {
+                    throw new EmailValidationException([
+                        'request' => ['The request body must be a valid JSON object.'],
+                    ]);
+                }
+            }
+            $request = EmailValidationRequest::fromArray($this->normalizeBody($body));
+            $result = $this->module->getValidationService()->validate($request);
+            $payload = $responder->success($result, $request->displayOnlyProblems);
+        } catch (EmailValidationException $exception) {
+            $payload = $responder->error($exception);
+        }
+
+        $response->statusCode = $payload['status'];
+        $response->data = $payload['body'];
+        return $response;
+    }
+
+    private function hasValidCsrfHeader(): bool
+    {
+        $request = Yii::$app->request;
+        $token = $request->getCsrfTokenFromHeader();
+
+        return $token !== null && $request->validateCsrfToken($token);
+    }
+
+    private function setInvalidJsonResponse(): void
+    {
+        $response = Yii::$app->response;
+        $response->format = Response::FORMAT_JSON;
+        $response->statusCode = 422;
+        $response->data = [
+            'errors' => [
+                'request' => ['The request body must be a valid JSON object.'],
+            ],
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    private function normalizeBody(mixed $body): array
+    {
+        if ($body instanceof \stdClass) {
+            return (array) $body;
+        }
+        if (is_array($body) && !array_is_list($body)) {
+            return $body;
+        }
+
+        throw new EmailValidationException([
+            'request' => ['The request body must be a valid JSON object.'],
+        ]);
+    }
+
+    private function decodeJsonBody(string $body): \stdClass
+    {
+        try {
+            $decoded = json_decode($body, false, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            throw new EmailValidationException([
+                'request' => ['The request body must be a valid JSON object.'],
+            ]);
+        }
+
+        if (!$decoded instanceof \stdClass) {
+            throw new EmailValidationException([
+                'request' => ['The request body must be a valid JSON object.'],
+            ]);
+        }
+
+        return $decoded;
+    }
+}

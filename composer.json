@@ -1,6 +1,6 @@
 {
   "name": "andmemasin/yii2-emails-validator",
-  "type": "project",
+  "type": "yii2-extension",
   "license":"MIT",
   "description": "A Yii2 module to do on-screen bulk validation of e-mails",
   "keywords": ["validation","yii2","email"],
@@ -29,7 +29,12 @@
     "codeception/module-db": "^3.0",
     "infection/codeception-adapter": "^0.4.7",
     "infection/infection": "^0.34",
-    "phpstan/phpstan": "^1.8"
+    "phpstan/phpstan": "^1.8",
+    "illuminate/container": "^11.0|^12.0",
+    "illuminate/http": "^11.0|^12.0",
+    "illuminate/routing": "^11.0|^12.0",
+    "illuminate/support": "^11.0|^12.0",
+    "illuminate/view": "^11.0|^12.0"
   },
   "config": {
     "platform": {
@@ -44,7 +49,12 @@
       "yiisoft/yii2-composer": true
     }
   },
+  "suggest": {
+    "illuminate/container": "Required only when using the optional Laravel adapter.",
+    "illuminate/routing": "Required only when using the optional Laravel adapter."
+  },
   "extra": {
+    "bootstrap": "andmemasin\\emailsvalidator\\Bootstrap",
     "branch-alias": {
       "dev-master": "2.1.x-dev"
     }

@@ -1,77 +1,88 @@
 <?php
 
+declare(strict_types=1);
+
 namespace andmemasin\emailsvalidator\controllers;
 
-use andmemasin\emailsvalidator\models\EmailsValidationForm;
 use andmemasin\emailsvalidator\Module;
+use andmemasin\emailsvalidator\models\EmailsValidationForm;
+use andmemasin\emailsvalidator\validation\EmailValidationException;
 use Yii;
 use yii\data\ArrayDataProvider;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\i18n\Formatter;
 use yii\web\Controller;
-use yii\filters\AccessControl;
 
 class SiteController extends Controller
 {
-    /** @var  Module */
+    /** @var Module */
     public $module;
 
-    public function init()
+    public function init(): void
     {
-        $this->module = \Yii::$app->getModule('emailsvalidator');
+        if (!$this->module instanceof Module) {
+            $this->module = Yii::$app->getModule('emailsvalidator');
+        }
         parent::init();
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'rules' => [
-                    [
-                        'actions' => ['index'],
-                        'allow' => true,
-                        'roles' => [$this->module->accessPermissionName],
-                    ],
-                ],
+                'rules' => [[
+                    'actions' => ['index'],
+                    'allow' => true,
+                    'roles' => [$this->module->accessPermissionName],
+                ]],
             ],
-        
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => ['index' => ['GET', 'POST']],
+            ],
         ];
     }
 
-    /**
-     * @return mixed
-     */
-    public function actionIndex()
+    public function actionIndex(): mixed
     {
-
-        /** @var EmailsValidationForm $model */
-        $model = new EmailsValidationForm();
+        $model = new EmailsValidationForm(['module' => $this->module]);
         $dataProvider = null;
 
-        if($model->load(Yii::$app->request->post()) && $model->process()){
-            $dataProvider = new ArrayDataProvider([
-                'allModels'=>($model->displayOnlyProblems ? $model->failingEmailAddresses:$model->emailAddresses),
-                'pagination' => [
-                    'pageSize' => count($model->emailAddresses),
-                ],
-            ]);
-            $formatter = new Formatter();
+        if ($model->load(Yii::$app->request->post())) {
+            try {
+                if ($model->process()) {
+                    $dataProvider = new ArrayDataProvider([
+                        'allModels' => $model->displayOnlyProblems
+                            ? $model->failingEmailAddresses
+                            : $model->emailAddresses,
+                        'pagination' => ['pageSize' => count($model->emailAddresses)],
+                    ]);
+                    $formatter = new Formatter();
 
-            if(!empty($model->failingEmailAddresses)){
-                Yii::$app->session->addFlash('danger',Yii::t('app','There were {count} e-mail addresses that failed validation!',[
-                    'count'=>count($model->failingEmailAddresses)
-                ]));
+                    if ($model->failingEmailAddresses !== []) {
+                        Yii::$app->session->addFlash('danger', Yii::t('app',
+                            'There were {count} e-mail addresses that failed validation!',
+                            ['count' => count($model->failingEmailAddresses)],
+                        ));
+                    }
+                    Yii::$app->session->addFlash('success', Yii::t('app',
+                        'Checked {count} e-mails in {duration}!',
+                        [
+                            'count' => count($model->emailAddresses),
+                            'duration' => $formatter->asDuration((int) Yii::getLogger()->getElapsedTime()),
+                        ],
+                    ));
+                }
+            } catch (EmailValidationException $exception) {
+                $model->addErrors($exception->errors());
             }
-            Yii::$app->session->addFlash('success',Yii::t('app','Checked {count} e-mails in {duration}!',[
-                'count'=>count($model->emailAddresses),
-                'duration'=>$formatter->asDuration((int)Yii::getLogger()->getElapsedTime())
-            ]));
         }
+
         return $this->render('index', [
-            'model'=>$model,
-            'dataProvider'=>$dataProvider,
+            'model' => $model,
+            'dataProvider' => $dataProvider,
         ]);
     }
-
-
 }

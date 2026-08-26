@@ -17,10 +17,12 @@ $columns = [
             /** @var EmailAddress $model */
             // hilight spaces
             $word = " ";
-            $text = preg_replace ("/" . preg_quote($word, '/') . "/",
+            $text = \yii\helpers\Html::encode($model->address);
+            return preg_replace(
+                "/" . preg_quote($word, '/') . "/",
                 "<span class='bg-primary'>&nbsp;</span>",
-                $model->address);
-            return $text;
+                $text,
+            );
 
         },
         'contentOptions' => function ($model) {

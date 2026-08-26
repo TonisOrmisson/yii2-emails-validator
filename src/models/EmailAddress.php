@@ -1,104 +1,83 @@
 <?php
 
+declare(strict_types=1);
+
 namespace andmemasin\emailsvalidator\models;
 
-
-use Egulias\EmailValidator\EmailValidator;
-use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
-use Egulias\EmailValidator\Validation\Extra\SpoofCheckValidation;
-use yii\base\Model;
-use Egulias\EmailValidator\Validation\RFCValidation;
-use Egulias\EmailValidator\Validation\DNSCheckValidation;
+use andmemasin\emailsvalidator\validation\EmailValidationRequest;
+use andmemasin\emailsvalidator\validation\EmailValidationResult;
+use andmemasin\emailsvalidator\validation\EmailValidationService;
 use Yii;
+use yii\base\Model;
 
 /**
- * Class EmailAddress
- * @author Tõnis Ormisson <tonis@andmemasin.eu>
- * @package andmemasin\emailsvalidator\models
+ * Compatibility Yii model for one validated address.
  */
 class EmailAddress extends Model
 {
-    /** @var  EmailValidator $validator */
-    private $validator;
-
-    /** @var string $address */
     public $address;
-
-    /** @var boolean */
     public $isValid = true;
-
-    /** @var boolean */
     public $isValidRFC = true;
-
-    /** @var boolean */
     public $isNoRFCWarnings = true;
-
-    /** @var boolean */
     public $isValidDNS = true;
-
-    /** @var boolean */
     public $isValidSpoofCheck = true;
-
-    /** @var boolean */
     public $needsTrimming;
-
-    /** @var string $error */
     public $error;
-
-    /** @var  boolean */
     public $checkDNS = true;
-
-    /** @var  boolean */
     public $checkSpoof = true;
 
-    public function init()
+    private ?EmailValidationResult $validationResult;
+
+    public function __construct($config = [], ?EmailValidationResult $validationResult = null)
     {
-        if(empty($this->address)) {
-            throw new \ErrorException("need an address here!");
+        $this->validationResult = $validationResult;
+        parent::__construct($config);
+    }
+
+    public static function fromValidationResult(
+        EmailValidationResult $result,
+        bool $checkDNS,
+        bool $checkSpoof,
+    ): self {
+        return new self([
+            'address' => $result->address,
+            'checkDNS' => $checkDNS,
+            'checkSpoof' => $checkSpoof,
+        ], $result);
+    }
+
+    public function init(): void
+    {
+        if (!is_string($this->address) || empty($this->address)) {
+            throw new \ErrorException('need an address here!');
         }
         parent::init();
-        $this->validator = new EmailValidator();
 
-        $this->runValidator();
+        $result = $this->validationResult ?? (new EmailValidationService())->validate(new EmailValidationRequest(
+            $this->address,
+            (bool) $this->checkDNS,
+            (bool) $this->checkSpoof,
+            false,
+        ))->results[0];
+
+        $this->isValid = $result->is_valid;
+        $this->isValidRFC = $result->is_valid_rfc;
+        $this->isNoRFCWarnings = $result->is_no_rfc_warnings;
+        $this->isValidDNS = $result->is_valid_dns;
+        $this->isValidSpoofCheck = $result->is_valid_spoof_check;
+        $this->needsTrimming = $result->needs_trimming;
     }
 
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
-            'address'=>Yii::t('app','E-mail address'),
-            'isValid'=>Yii::t('app','Is valid?'),
-            'isValidRFC'=>Yii::t('app','In line with RFC standard?'),
-            'isNoRFCWarnings'=>Yii::t('app','No RFC warnings?'),
-            'isValidDNS'=>Yii::t('app','DNS check passed?'),
-            'needsTrimming'=>Yii::t('app','Has spaces to be trimmed?'),
-            'isValidSpoofCheck'=>Yii::t('app','Spoof check OK?'),
-
+            'address' => Yii::t('app', 'E-mail address'),
+            'isValid' => Yii::t('app', 'Is valid?'),
+            'isValidRFC' => Yii::t('app', 'In line with RFC standard?'),
+            'isNoRFCWarnings' => Yii::t('app', 'No RFC warnings?'),
+            'isValidDNS' => Yii::t('app', 'DNS check passed?'),
+            'needsTrimming' => Yii::t('app', 'Has spaces to be trimmed?'),
+            'isValidSpoofCheck' => Yii::t('app', 'Spoof check OK?'),
         ];
     }
-
-
-    /**
-     * run the different validators
-     * @return void
-     */
-    private function runValidator(){
-        $this->isValidRFC = $this->validator->isValid($this->address, new RFCValidation());
-        $this->isNoRFCWarnings = $this->validator->isValid($this->address, new NoRFCWarningsValidation());
-
-        if($this->checkDNS){
-            $this->isValidDNS = $this->validator->isValid($this->address, new DNSCheckValidation());
-        }
-
-        if($this->checkSpoof) {
-            $this->isValidSpoofCheck = $this->validator->isValid($this->address, new SpoofCheckValidation());
-        }
-
-        $this->setNeedsTrimming();
-        $this->isValid = ($this->isValidRFC && $this->isNoRFCWarnings && $this->isValidDNS && $this->isValidSpoofCheck );
-    }
-
-    private function setNeedsTrimming(){
-        $this->needsTrimming = ($this->address !== trim($this->address));
-    }
-
 }
