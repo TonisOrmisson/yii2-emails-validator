@@ -6,7 +6,6 @@ namespace andmemasin\emailsvalidator;
 
 use andmemasin\emailsvalidator\validation\EmailValidationService;
 use Yii;
-use yii\helpers\Url;
 
 class Module extends \yii\base\Module
 {
@@ -28,7 +27,7 @@ class Module extends \yii\base\Module
 
     public function apiBasePath(): string
     {
-        return Url::toRoute('/' . trim($this->getUniqueId(), '/') . '/api/email-validation/index');
+        return rtrim(Yii::$app->request->getBaseUrl(), '/') . '/' . $this->getUniqueId() . '/api/v1/email-validations';
     }
 
     /** @return array<string, string> */

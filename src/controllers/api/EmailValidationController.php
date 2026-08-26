@@ -47,6 +47,12 @@ final class EmailValidationController extends Controller
 
         try {
             $body = Yii::$app->request->getBodyParams();
+            if ($body === [] && str_starts_with(
+                strtolower((string) Yii::$app->request->getContentType()),
+                'application/json',
+            )) {
+                $body = $this->decodeJsonBody(Yii::$app->request->getRawBody());
+            }
             $request = EmailValidationRequest::fromArray(is_array($body) ? $body : []);
             $result = $this->module->getValidationService()->validate($request);
             $payload = $responder->success($result, $request->displayOnlyProblems);
@@ -57,5 +63,25 @@ final class EmailValidationController extends Controller
         $response->statusCode = $payload['status'];
         $response->data = $payload['body'];
         return $response;
+    }
+
+    /** @return array<string, mixed> */
+    private function decodeJsonBody(string $body): array
+    {
+        try {
+            $decoded = json_decode($body, false, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            throw new EmailValidationException([
+                'request' => ['The request body must be a valid JSON object.'],
+            ]);
+        }
+
+        if (!$decoded instanceof \stdClass) {
+            throw new EmailValidationException([
+                'request' => ['The request body must be a valid JSON object.'],
+            ]);
+        }
+
+        return (array) $decoded;
     }
 }

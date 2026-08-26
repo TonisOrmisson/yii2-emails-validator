@@ -3,7 +3,7 @@
   "info": {
     "title": "EmailsValidator API",
     "version": "1.0.0",
-    "description": "Stateless e-mail address validation."
+    "description": "Stateless e-mail address validation. The host application configures the maximum input size; the default is 128 KB (128 KiB)."
   },
   "servers": [
     {"url": "/"},
@@ -14,6 +14,14 @@
       "post": {
         "operationId": "validateEmailAddresses",
         "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -52,7 +60,7 @@
         "type": "object",
         "required": ["textInput", "checkDNS", "checkSpoof", "displayOnlyProblems"],
         "properties": {
-          "textInput": {"type": "string", "minLength": 1, "maxLength": 131072},
+          "textInput": {"type": "string", "minLength": 1},
           "checkDNS": {"type": "boolean", "default": true},
           "checkSpoof": {"type": "boolean", "default": true},
           "displayOnlyProblems": {"type": "boolean", "default": true}

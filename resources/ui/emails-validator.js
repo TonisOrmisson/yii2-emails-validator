@@ -1,5 +1,12 @@
 (() => {
+    let instanceCounter = 0;
+
     class EmailsValidator extends HTMLElement {
+        constructor() {
+            super();
+            this.instanceId = `emails-validator-${++instanceCounter}`;
+        }
+
         connectedCallback() {
             if (this.form) return;
             this.apiBase = this.getAttribute('api-base') || '';
@@ -12,14 +19,14 @@
             this.form.addEventListener('submit', (event) => this.submit(event));
 
             const label = document.createElement('label');
-            label.setAttribute('for', 'emails-validator-input');
             label.textContent = 'E-mail addresses';
             this.form.append(label);
 
             this.textInput = document.createElement('textarea');
-            this.textInput.id = 'emails-validator-input';
+            this.textInput.id = `${this.instanceId}-input`;
             this.textInput.name = 'textInput';
             this.textInput.rows = 10;
+            label.setAttribute('for', this.textInput.id);
             this.form.append(this.textInput);
 
             this.displayOnlyProblems = this.checkbox('displayOnlyProblems', 'Display only e-mails with problems', true);
@@ -46,7 +53,7 @@
             const input = document.createElement('input');
             input.type = 'checkbox';
             input.name = name;
-            input.id = `emails-validator-${name}`;
+            input.id = `${this.instanceId}-${name}`;
             input.checked = checked;
             const label = document.createElement('label');
             label.setAttribute('for', input.id);
