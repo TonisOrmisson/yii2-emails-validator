@@ -5,6 +5,10 @@
     "version": "1.0.0",
     "description": "Stateless e-mail address validation."
   },
+  "servers": [
+    {"url": "/"},
+    {"url": "/emailsvalidator"}
+  ],
   "paths": {
     "/api/v1/email-validations": {
       "post": {

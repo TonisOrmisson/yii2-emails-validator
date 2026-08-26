@@ -1,6 +1,6 @@
 {
   "name": "andmemasin/yii2-emails-validator",
-  "type": "project",
+  "type": "yii2-extension",
   "license":"MIT",
   "description": "A Yii2 module to do on-screen bulk validation of e-mails",
   "keywords": ["validation","yii2","email"],

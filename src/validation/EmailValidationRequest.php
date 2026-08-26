@@ -18,6 +18,7 @@ final readonly class EmailValidationRequest
     public static function fromArray(array $payload): self
     {
         $errors = [];
+        $knownFields = ['textInput', 'checkDNS', 'checkSpoof', 'displayOnlyProblems'];
 
         if (!array_key_exists('textInput', $payload) || !is_string($payload['textInput']) || $payload['textInput'] === '') {
             $errors['textInput'] = ['The e-mail input is required.'];
@@ -28,6 +29,12 @@ final readonly class EmailValidationRequest
                 $errors[$field] = ['This field is required.'];
             } elseif (!is_bool($payload[$field])) {
                 $errors[$field] = ['The value must be a boolean.'];
+            }
+        }
+
+        foreach (array_keys($payload) as $field) {
+            if (!in_array($field, $knownFields, true)) {
+                $errors[(string) $field] = ['Unknown property.'];
             }
         }
 
