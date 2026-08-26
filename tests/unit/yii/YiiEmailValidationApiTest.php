@@ -68,9 +68,9 @@ final class YiiEmailValidationApiTest extends Unit
 
         $routes = Module::apiRouteRules();
 
-        self::assertCount(1, $routes);
-        self::assertArrayHasKey('POST api/v1/email-validations', $routes);
-        self::assertStringContainsString('email-validation', (string) $routes['POST api/v1/email-validations']);
+        self::assertSame([
+            'POST emailsvalidator/api/v1/email-validations' => 'emailsvalidator/api/email-validation/index',
+        ], $routes);
 
         self::assertSame([
             'POST custom-emails/api/v1/email-validations' => 'custom-emails/api/email-validation/index',
@@ -83,13 +83,14 @@ final class YiiEmailValidationApiTest extends Unit
             'id' => 'emails-validator-bootstrap-test',
             'basePath' => dirname(__DIR__, 3),
             'modules' => [
-                'custom-emails' => ['class' => Module::class],
+                'emailsvalidator' => ['class' => Module::class],
             ],
             'components' => [
                 'request' => ['cookieValidationKey' => 'emails-validator-bootstrap-test'],
                 'urlManager' => [
                     'class' => UrlManager::class,
                     'enablePrettyUrl' => true,
+                    'enableStrictParsing' => true,
                     'showScriptName' => false,
                 ],
             ],
@@ -100,16 +101,16 @@ final class YiiEmailValidationApiTest extends Unit
 
         $app->set('request', Stub::make(Request::class, [
             'getMethod' => 'POST',
-            'getPathInfo' => 'custom-emails/api/v1/email-validations',
+            'getPathInfo' => 'emailsvalidator/api/v1/email-validations',
         ]));
         self::assertSame(
-            ['custom-emails/api/email-validation/index', []],
+            ['emailsvalidator/api/email-validation/index', []],
             $app->urlManager->parseRequest($app->request),
         );
 
         $app->set('request', Stub::make(Request::class, [
             'getMethod' => 'GET',
-            'getPathInfo' => 'custom-emails/api/v1/email-validations',
+            'getPathInfo' => 'emailsvalidator/api/v1/email-validations',
         ]));
         self::assertFalse($app->urlManager->parseRequest($app->request));
     }
