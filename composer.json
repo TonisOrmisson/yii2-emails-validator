@@ -54,6 +54,7 @@
     "illuminate/routing": "Required only when using the optional Laravel adapter."
   },
   "extra": {
+    "bootstrap": "andmemasin\\emailsvalidator\\Bootstrap",
     "branch-alias": {
       "dev-master": "2.1.x-dev"
     }

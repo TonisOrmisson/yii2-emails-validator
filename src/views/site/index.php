@@ -1,9 +1,9 @@
 <?php
 
 use andmemasin\emailsvalidator\EmailValidatorAsset;
+use andmemasin\emailsvalidator\Module;
 use andmemasin\emailsvalidator\models\EmailsValidationForm;
 use yii\helpers\Html;
-use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
@@ -13,12 +13,16 @@ use yii\widgets\ActiveForm;
 $this->title = Yii::t('app', 'Bulk e-mail validation');
 $this->params['breadcrumbs'][] = Yii::t('app', 'E-mail validation');
 $isPost = Yii::$app->request->getIsPost();
+$module = Yii::$app->controller?->module;
+if (!$module instanceof Module) {
+    $module = Yii::$app->getModule('emailsvalidator');
+}
 
 if (!$isPost) {
     $asset = EmailValidatorAsset::register($this);
     ?>
     <emails-validator
-        api-base="<?= Html::encode(Url::to(['/api/v1/email-validations'])) ?>"
+        api-base="<?= Html::encode($module->apiBasePath()) ?>"
         csrf-token="<?= Html::encode(Yii::$app->request->getCsrfToken()) ?>"
         asset-base="<?= Html::encode((string) $asset->baseUrl) ?>"
     ></emails-validator>

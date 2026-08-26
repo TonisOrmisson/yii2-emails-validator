@@ -120,9 +120,18 @@
             const body = document.createElement('tbody');
             results.forEach((result) => {
                 const resultRow = document.createElement('tr');
-                [result.address, result.needs_trimming, result.is_valid, result.is_valid_rfc,
-                    result.is_no_rfc_warnings, result.is_valid_dns, result.is_valid_spoof_check].forEach((value) => {
+                resultRow.classList.add(result.is_valid ? 'success' : 'error');
+                [
+                    [result.address, result.is_valid ? 'success' : 'error'],
+                    [result.needs_trimming, result.needs_trimming ? 'warning' : 'success'],
+                    [result.is_valid, result.is_valid ? 'success' : 'error'],
+                    [result.is_valid_rfc, result.is_valid_rfc ? 'success' : 'error'],
+                    [result.is_no_rfc_warnings, result.is_no_rfc_warnings ? 'success' : 'error'],
+                    [result.is_valid_dns, result.is_valid_dns ? 'success' : 'error'],
+                    [result.is_valid_spoof_check, result.is_valid_spoof_check ? 'success' : 'error'],
+                ].forEach(([value, className]) => {
                     const cell = document.createElement('td');
+                    cell.classList.add(className);
                     cell.textContent = typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value ?? '');
                     resultRow.append(cell);
                 });

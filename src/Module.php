@@ -26,9 +26,26 @@ class Module extends \yii\base\Module
     }
 
     /** @return array<string, string> */
-    public static function apiRouteRules(): array
+    public function apiBasePath(): string
     {
-        return ['POST api/v1/email-validations' => 'emailsvalidator/api/email-validation/index'];
+        $baseUrl = rtrim(Yii::$app->request->getBaseUrl(), '/');
+
+        return $baseUrl . '/' . trim($this->getUniqueId(), '/') . '/api/v1/email-validations';
+    }
+
+    /** @return array<string, string> */
+    public static function apiRouteRules(string $moduleId = 'emailsvalidator'): array
+    {
+        $moduleId = trim($moduleId, '/');
+        $base = $moduleId . '/api/v1/email-validations';
+        $controller = $moduleId . '/api/email-validation';
+
+        // Keep the legacy static declaration for hosts that still merge it directly.
+        if (func_num_args() === 0) {
+            return ['POST api/v1/email-validations' => 'emailsvalidator/api/email-validation/index'];
+        }
+
+        return ["POST {$base}" => "{$controller}/index"];
     }
 
     public function getValidationService(): EmailValidationService

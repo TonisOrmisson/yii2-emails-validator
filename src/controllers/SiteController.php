@@ -21,7 +21,9 @@ class SiteController extends Controller
 
     public function init(): void
     {
-        $this->module = Yii::$app->getModule('emailsvalidator');
+        if (!$this->module instanceof Module) {
+            $this->module = Yii::$app->getModule('emailsvalidator');
+        }
         parent::init();
     }
 
@@ -45,7 +47,7 @@ class SiteController extends Controller
 
     public function actionIndex(): mixed
     {
-        $model = new EmailsValidationForm();
+        $model = new EmailsValidationForm(['module' => $this->module]);
         $dataProvider = null;
 
         if ($model->load(Yii::$app->request->post())) {

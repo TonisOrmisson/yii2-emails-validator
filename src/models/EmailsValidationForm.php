@@ -23,7 +23,9 @@ class EmailsValidationForm extends Model
 
     public function init(): void
     {
-        $this->module = Yii::$app->getModule('emailsvalidator');
+        if (!$this->module instanceof Module) {
+            $this->module = Yii::$app->getModule('emailsvalidator');
+        }
         parent::init();
     }
 
