@@ -10,6 +10,28 @@ emails-validator textarea {
     margin: .5rem 0 1rem;
 }
 
+/* own borders: a host's CSS reset (Tailwind preflight in Filament) removes the browser's */
+emails-validator textarea,
+emails-validator button {
+    border: 1px solid #8a8f98;
+    border-radius: .25rem;
+    font: inherit;
+}
+
+emails-validator textarea {
+    padding: .5rem;
+}
+
+emails-validator button {
+    padding: .375rem .75rem;
+    cursor: pointer;
+}
+
+emails-validator button:disabled {
+    opacity: .6;
+    cursor: default;
+}
+
 emails-validator label,
 emails-validator button,
 emails-validator input {

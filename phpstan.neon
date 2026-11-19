@@ -2,5 +2,8 @@ parameters:
     level: 0
     paths:
         - src
+    excludePaths:
+        # needs filament/filament, which is only suggested; analysed from the dev shell root
+        - src/laravel/filament/*
     bootstrapFiles:
         - stan_autoload.php

@@ -51,7 +51,8 @@
   },
   "suggest": {
     "illuminate/container": "Required only when using the optional Laravel adapter.",
-    "illuminate/routing": "Required only when using the optional Laravel adapter."
+    "illuminate/routing": "Required only when using the optional Laravel adapter.",
+    "filament/filament": "for the e-mail validation page in a Laravel host's Filament panel (EmailsValidatorPlugin)"
   },
   "extra": {
     "bootstrap": "andmemasin\\emailsvalidator\\Bootstrap",
