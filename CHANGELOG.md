@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.3.0 - 2026-11-19
 
 - The ability name is a stable public contract: new `Abilities::ACCESS` (`access::emailsValidator`), never renamed; a host maps its own roles to it through its RBAC or Gate. The Yii `accessPermissionName` default and `EmailsValidatorPlugin::ACCESS_PERMISSION` are this constant; nothing changes in what is checked.
 
