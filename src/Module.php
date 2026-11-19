@@ -9,7 +9,7 @@ use Yii;
 
 class Module extends \yii\base\Module
 {
-    public $accessPermissionName = 'access::emailsValidator';
+    public $accessPermissionName = Abilities::ACCESS;
     public $controllerNamespace = 'andmemasin\\emailsvalidator\\controllers';
     public $defaultRoute = 'site/index';
     /** @var int Limit input to this many kilobytes. */

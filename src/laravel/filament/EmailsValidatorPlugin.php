@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace andmemasin\emailsvalidator\laravel\filament;
 
+use andmemasin\emailsvalidator\Abilities;
 use andmemasin\emailsvalidator\laravel\filament\Pages\ValidateEmails;
 use Filament\Contracts\Plugin;
 use Filament\Facades\Filament;
@@ -17,7 +18,7 @@ use Filament\Support\Assets\Css;
 final class EmailsValidatorPlugin implements Plugin
 {
     /** The Yii Module::$accessPermissionName default; the host's API middleware should ask the same item. */
-    public const ACCESS_PERMISSION = 'access::emailsValidator';
+    public const ACCESS_PERMISSION = Abilities::ACCESS;
 
     /** Where `php artisan filament:assets` publishes the `<emails-validator>` files, the view's assetBase. */
     public const ASSET_BASE = 'js/andmemasin/emailsvalidator';

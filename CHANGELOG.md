@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- The ability name is a stable public contract: new `Abilities::ACCESS` (`access::emailsValidator`), never renamed; a host maps its own roles to it through its RBAC or Gate. The Yii `accessPermissionName` default and `EmailsValidatorPlugin::ACCESS_PERMISSION` are this constant; nothing changes in what is checked.
+
 ## 2.2.0 - 2026-11-19
 
 - Filament admin: new `laravel\filament\EmailsValidatorPlugin` (`$panel->plugin(EmailsValidatorPlugin::make())`; `filament/filament` is only suggested) with the page `Pages\ValidateEmails` (`/admin/validate-emails`, Tools > Validate e-mails, as the Yii sidebar), which mounts `<emails-validator>` through the `emailsvalidator::index` view on the Laravel e-mail validation API. The page asks the Yii `accessPermissionName` default `access::emailsValidator` (`EmailsValidatorPlugin::make($item)` for another item); the host should put the same item on the API (`emailsvalidator.middleware`, e.g. `can:access::emailsValidator`). `php artisan filament:assets` publishes the component and its CSS to `public/js/andmemasin/emailsvalidator/`.
