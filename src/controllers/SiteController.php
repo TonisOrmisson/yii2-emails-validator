@@ -76,7 +76,9 @@ class SiteController extends Controller
                     ));
                 }
             } catch (EmailValidationException $exception) {
-                $model->addErrors($exception->errors());
+                // the service names the input as the v1 API does; the form field is `textInput`
+                $errors = $exception->errors();
+                $model->addErrors(array_combine(array_map(static fn(string $field): string => $field === 'text_input' ? 'textInput' : $field, array_keys($errors)), $errors));
             }
         }
 

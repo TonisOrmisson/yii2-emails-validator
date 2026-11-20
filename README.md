@@ -26,8 +26,8 @@ Hosts that load the source directly, such as the dev app, must instead merge
 URL rules. This registers the same endpoint; do not register an additional
 unprefixed Yii route.
 
-The endpoint accepts `textInput`, `checkDNS`, `checkSpoof`, and
-`displayOnlyProblems`, and returns the documented `200` result or `422`
+The endpoint accepts `text_input`, `check_dns`, `check_spoof`, and
+`display_only_problems`, and returns the documented `200` result or `422`
 field-error response. The OpenAPI 3.1 document is at
 `resources/openapi/email-validation-v1.json`.
 

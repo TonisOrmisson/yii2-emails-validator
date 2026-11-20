@@ -14,17 +14,17 @@ final readonly class EmailValidationRequest
     ) {
     }
 
-    /** @param array<string, mixed> $payload */
+    /** @param array<string, mixed> $payload the v1 request body (snake_case names) */
     public static function fromArray(array $payload): self
     {
         $errors = [];
-        $knownFields = ['textInput', 'checkDNS', 'checkSpoof', 'displayOnlyProblems'];
+        $knownFields = ['text_input', 'check_dns', 'check_spoof', 'display_only_problems'];
 
-        if (!array_key_exists('textInput', $payload) || !is_string($payload['textInput']) || $payload['textInput'] === '') {
-            $errors['textInput'] = ['The e-mail input is required.'];
+        if (!array_key_exists('text_input', $payload) || !is_string($payload['text_input']) || $payload['text_input'] === '') {
+            $errors['text_input'] = ['The e-mail input is required.'];
         }
 
-        foreach (['checkDNS', 'checkSpoof', 'displayOnlyProblems'] as $field) {
+        foreach (['check_dns', 'check_spoof', 'display_only_problems'] as $field) {
             if (!array_key_exists($field, $payload)) {
                 $errors[$field] = ['This field is required.'];
             } elseif (!is_bool($payload[$field])) {
@@ -43,10 +43,10 @@ final readonly class EmailValidationRequest
         }
 
         return new self(
-            $payload['textInput'],
-            $payload['checkDNS'],
-            $payload['checkSpoof'],
-            $payload['displayOnlyProblems'],
+            $payload['text_input'],
+            $payload['check_dns'],
+            $payload['check_spoof'],
+            $payload['display_only_problems'],
         );
     }
 }

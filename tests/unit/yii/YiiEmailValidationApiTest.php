@@ -174,10 +174,10 @@ final class YiiEmailValidationApiTest extends Unit
         $controller = new EmailValidationController('email-validation', $module);
 
         $success = $this->call($controller, [
-            'textInput' => "good@example.com\nnot-an-email",
-            'checkDNS' => false,
-            'checkSpoof' => false,
-            'displayOnlyProblems' => false,
+            'text_input' => "good@example.com\nnot-an-email",
+            'check_dns' => false,
+            'check_spoof' => false,
+            'display_only_problems' => false,
         ]);
         self::assertSame(200, $success->statusCode);
         self::assertSame(2, $success->data['meta']['total']);
@@ -185,13 +185,13 @@ final class YiiEmailValidationApiTest extends Unit
         self::assertCount(2, $success->data['data']);
 
         $invalid = $this->call($controller, [
-            'textInput' => 123,
-            'checkDNS' => false,
-            'checkSpoof' => false,
-            'displayOnlyProblems' => false,
+            'text_input' => 123,
+            'check_dns' => false,
+            'check_spoof' => false,
+            'display_only_problems' => false,
         ]);
         self::assertSame(422, $invalid->statusCode);
-        self::assertArrayHasKey('textInput', $invalid->data['errors']);
+        self::assertArrayHasKey('text_input', $invalid->data['errors']);
         self::assertStringNotContainsString('Exception', json_encode($invalid->data));
     }
 
@@ -202,10 +202,10 @@ final class YiiEmailValidationApiTest extends Unit
         $module->accessPermissionName = 'configured.email.permission';
         $controller = new EmailValidationController('email-validation', $module);
         $payload = [
-            'textInput' => 'good@example.com',
-            'checkDNS' => false,
-            'checkSpoof' => false,
-            'displayOnlyProblems' => false,
+            'text_input' => 'good@example.com',
+            'check_dns' => false,
+            'check_spoof' => false,
+            'display_only_problems' => false,
         ];
         $parser = new JsonParser();
         $parser->asArray = false;
@@ -232,10 +232,10 @@ final class YiiEmailValidationApiTest extends Unit
     {
         $controller = $this->controller();
         $response = $this->callRaw($controller, json_encode([
-            'textInput' => 'good@example.com',
-            'checkDNS' => false,
-            'checkSpoof' => false,
-            'displayOnlyProblems' => false,
+            'text_input' => 'good@example.com',
+            'check_dns' => false,
+            'check_spoof' => false,
+            'display_only_problems' => false,
         ], JSON_THROW_ON_ERROR));
 
         self::assertSame(200, $response->statusCode);
@@ -244,7 +244,7 @@ final class YiiEmailValidationApiTest extends Unit
 
     public function testMalformedJsonReturnsAGenericRequestErrorWithoutAConfiguredParser(): void
     {
-        $response = $this->callRaw($this->controller(), '{"textInput":"good@example.com",');
+        $response = $this->callRaw($this->controller(), '{"text_input":"good@example.com",');
 
         self::assertSame(422, $response->statusCode);
         self::assertSame([
@@ -277,10 +277,10 @@ final class YiiEmailValidationApiTest extends Unit
     {
         $response = $this->callRaw($this->controller(), json_encode([
             0 => 'unexpected',
-            'textInput' => 'good@example.com',
-            'checkDNS' => false,
-            'checkSpoof' => false,
-            'displayOnlyProblems' => false,
+            'text_input' => 'good@example.com',
+            'check_dns' => false,
+            'check_spoof' => false,
+            'display_only_problems' => false,
         ], JSON_THROW_ON_ERROR));
 
         self::assertSame(422, $response->statusCode);
@@ -359,10 +359,10 @@ final class YiiEmailValidationApiTest extends Unit
     {
         $this->configureAccess(true);
         $this->setRequest('POST', true, [
-            'textInput' => 'good@example.com',
-            'checkDNS' => false,
-            'checkSpoof' => false,
-            'displayOnlyProblems' => false,
+            'text_input' => 'good@example.com',
+            'check_dns' => false,
+            'check_spoof' => false,
+            'display_only_problems' => false,
         ]);
         $controller = $this->controller();
 
@@ -388,7 +388,7 @@ final class YiiEmailValidationApiTest extends Unit
         $this->configureAccess(true);
         $parserDetails = 'configured parser detail: malformed JSON';
         $parserCalls = 0;
-        $rawBody = '{"textInput":"parser-secret",';
+        $rawBody = '{"text_input":"parser-secret",';
 
         \Yii::$app->set('request', Stub::make(Request::class, [
             'getIsPost' => true,
@@ -440,7 +440,7 @@ final class YiiEmailValidationApiTest extends Unit
     {
         $this->configureAccess(true);
         $parserDetails = 'configured parser detail: malformed JSON';
-        $rawBody = '{"textInput":"parser-secret",';
+        $rawBody = '{"text_input":"parser-secret",';
         $serverToken = \Yii::$app->security->maskToken(hash('sha256', 'server-token'));
         $csrfToken = $csrfHeader === null
             ? null

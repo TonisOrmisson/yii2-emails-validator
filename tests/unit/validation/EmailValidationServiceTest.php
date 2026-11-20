@@ -55,13 +55,13 @@ final class EmailValidationServiceTest extends Unit
         $this->assertValidationClassesAvailable();
 
         foreach ([
-            [[], ['textInput', 'checkDNS', 'checkSpoof', 'displayOnlyProblems']],
-            [['textInput' => ''], ['textInput', 'checkDNS', 'checkSpoof', 'displayOnlyProblems']],
-            [['textInput' => null], ['textInput', 'checkDNS', 'checkSpoof', 'displayOnlyProblems']],
-            [['textInput' => 123], ['textInput', 'checkDNS', 'checkSpoof', 'displayOnlyProblems']],
-            [['textInput' => 'good@example.com', 'checkDNS' => 'yes'], ['checkDNS', 'checkSpoof', 'displayOnlyProblems']],
-            [['textInput' => 'good@example.com', 'checkSpoof' => 1], ['checkDNS', 'checkSpoof', 'displayOnlyProblems']],
-            [['textInput' => 'good@example.com', 'displayOnlyProblems' => 0], ['checkDNS', 'checkSpoof', 'displayOnlyProblems']],
+            [[], ['text_input', 'check_dns', 'check_spoof', 'display_only_problems']],
+            [['text_input' => ''], ['text_input', 'check_dns', 'check_spoof', 'display_only_problems']],
+            [['text_input' => null], ['text_input', 'check_dns', 'check_spoof', 'display_only_problems']],
+            [['text_input' => 123], ['text_input', 'check_dns', 'check_spoof', 'display_only_problems']],
+            [['text_input' => 'good@example.com', 'check_dns' => 'yes'], ['check_dns', 'check_spoof', 'display_only_problems']],
+            [['text_input' => 'good@example.com', 'check_spoof' => 1], ['check_dns', 'check_spoof', 'display_only_problems']],
+            [['text_input' => 'good@example.com', 'display_only_problems' => 0], ['check_dns', 'check_spoof', 'display_only_problems']],
         ] as [$payload, $fields]) {
             try {
                 EmailValidationRequest::fromArray($payload);
@@ -78,7 +78,7 @@ final class EmailValidationServiceTest extends Unit
             $service->validate($this->request(str_repeat('x', 9), false, false, false));
             self::fail('Over-limit input was accepted.');
         } catch (EmailValidationException $exception) {
-            self::assertSame(['textInput'], array_keys($exception->errors()));
+            self::assertSame(['text_input'], array_keys($exception->errors()));
         }
     }
 
@@ -94,17 +94,17 @@ final class EmailValidationServiceTest extends Unit
             $service->validate($this->request('äää', false, false, false));
             self::fail('Input exceeding the byte limit was accepted.');
         } catch (EmailValidationException $exception) {
-            self::assertSame(['textInput'], array_keys($exception->errors()));
+            self::assertSame(['text_input'], array_keys($exception->errors()));
         }
     }
 
     public function testInputBoundaryRejectsUnknownPropertiesAsFieldErrors(): void
     {
         $payload = [
-            'textInput' => 'good@example.com',
-            'checkDNS' => false,
-            'checkSpoof' => false,
-            'displayOnlyProblems' => false,
+            'text_input' => 'good@example.com',
+            'check_dns' => false,
+            'check_spoof' => false,
+            'display_only_problems' => false,
             'unknown' => 'not-allowed',
         ];
 

@@ -44,7 +44,7 @@ final class EmailValidationOpenApiTest extends Unit
         self::assertArrayHasKey('EmailValidationResponse', $schemas);
         self::assertArrayHasKey('EmailValidationErrorResponse', $schemas);
         self::assertSame(
-            ['textInput', 'checkDNS', 'checkSpoof', 'displayOnlyProblems'],
+            ['text_input', 'check_dns', 'check_spoof', 'display_only_problems'],
             $schemas['EmailValidationRequest']['required'],
         );
         self::assertSame(
@@ -64,7 +64,7 @@ final class EmailValidationOpenApiTest extends Unit
         $document = json_decode((string) file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
         $schema = $document['components']['schemas']['EmailValidationRequest'];
 
-        self::assertArrayNotHasKey('maxLength', $schema['properties']['textInput']);
+        self::assertArrayNotHasKey('maxLength', $schema['properties']['text_input']);
         $description = $document['info']['description'] ?? '';
         self::assertStringContainsString('128 KB', $description);
         self::assertStringContainsString('configur', strtolower($description));

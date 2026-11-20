@@ -40,9 +40,9 @@ final class EmailValidationService
     {
         $errors = [];
         if ($request->textInput === '') {
-            $errors['textInput'] = ['The e-mail input is required.'];
+            $errors['text_input'] = ['The e-mail input is required.'];
         } elseif (strlen($request->textInput) > $this->maxInputLength) {
-            $errors['textInput'] = ['The e-mail input is too long.'];
+            $errors['text_input'] = ['The e-mail input is too long.'];
         }
         if ($errors !== []) {
             throw new EmailValidationException($errors);

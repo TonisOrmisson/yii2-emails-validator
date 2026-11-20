@@ -78,10 +78,10 @@
                         'X-CSRF-Token': this.csrfToken
                     },
                     body: JSON.stringify({
-                        textInput: this.textInput.value,
-                        checkDNS: this.checkDNS.checked,
-                        checkSpoof: this.checkSpoof.checked,
-                        displayOnlyProblems: this.displayOnlyProblems.checked
+                        text_input: this.textInput.value,
+                        check_dns: this.checkDNS.checked,
+                        check_spoof: this.checkSpoof.checked,
+                        display_only_problems: this.displayOnlyProblems.checked
                     })
                 });
                 const payload = await response.json();

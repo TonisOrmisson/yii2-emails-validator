@@ -104,14 +104,14 @@ final class LaravelEmailValidationApiTest extends Unit
     public function testControllerUsesJsonBodyBeforeConflictingQueryInput(): void
     {
         $payload = [
-            'textInput' => 'good@example.com',
-            'checkDNS' => false,
-            'checkSpoof' => false,
-            'displayOnlyProblems' => false,
+            'text_input' => 'good@example.com',
+            'check_dns' => false,
+            'check_spoof' => false,
+            'display_only_problems' => false,
         ];
 
         $withoutQuery = $this->callController($payload);
-        $withQuery = $this->callController($payload, '?textInput=not-an-email');
+        $withQuery = $this->callController($payload, '?text_input=not-an-email');
 
         self::assertSame(200, $withoutQuery->getStatusCode());
         self::assertSame($withoutQuery->getData(true), $withQuery->getData(true));
@@ -120,28 +120,28 @@ final class LaravelEmailValidationApiTest extends Unit
     public function testControllerReturnsMalformedAndOverLimitInputAs422WithoutDetails(): void
     {
         $malformed = $this->callController([
-            'textInput' => 123,
-            'checkDNS' => false,
-            'checkSpoof' => false,
-            'displayOnlyProblems' => false,
+            'text_input' => 123,
+            'check_dns' => false,
+            'check_spoof' => false,
+            'display_only_problems' => false,
         ]);
         self::assertSame(422, $malformed->getStatusCode());
-        self::assertSame(['textInput'], array_keys($malformed->getData(true)['errors']));
+        self::assertSame(['text_input'], array_keys($malformed->getData(true)['errors']));
         self::assertStringNotContainsString('Exception', $malformed->getContent());
 
         $overLimit = $this->callController([
-            'textInput' => str_repeat('a', 128 * 1024 + 1),
-            'checkDNS' => false,
-            'checkSpoof' => false,
-            'displayOnlyProblems' => false,
+            'text_input' => str_repeat('a', 128 * 1024 + 1),
+            'check_dns' => false,
+            'check_spoof' => false,
+            'display_only_problems' => false,
         ]);
         self::assertSame(422, $overLimit->getStatusCode());
-        self::assertArrayHasKey('textInput', $overLimit->getData(true)['errors']);
+        self::assertArrayHasKey('text_input', $overLimit->getData(true)['errors']);
     }
 
     public function testControllerReturnsGenericRequestErrorForMalformedRawJson(): void
     {
-        $response = $this->callRawController('{"textInput":"good@example.com",');
+        $response = $this->callRawController('{"text_input":"good@example.com",');
 
         self::assertSame(422, $response->getStatusCode());
         self::assertSame([
@@ -168,10 +168,10 @@ final class LaravelEmailValidationApiTest extends Unit
     public function testLaravelResponseMatchesTheYiiResponseForTheSamePayload(): void
     {
         $payload = [
-            'textInput' => "good@example.com\nnot-an-email",
-            'checkDNS' => false,
-            'checkSpoof' => false,
-            'displayOnlyProblems' => false,
+            'text_input' => "good@example.com\nnot-an-email",
+            'check_dns' => false,
+            'check_spoof' => false,
+            'display_only_problems' => false,
         ];
         $laravel = $this->callController($payload);
 
@@ -189,13 +189,13 @@ final class LaravelEmailValidationApiTest extends Unit
     public function testControllerResponseFilteringAndFieldsMatchTheJsonContract(): void
     {
         $payload = [
-            'textInput' => "good@example.com\nnot-an-email",
-            'checkDNS' => false,
-            'checkSpoof' => false,
-            'displayOnlyProblems' => false,
+            'text_input' => "good@example.com\nnot-an-email",
+            'check_dns' => false,
+            'check_spoof' => false,
+            'display_only_problems' => false,
         ];
         $all = $this->callController($payload)->getData(true);
-        $problems = $this->callController(array_replace($payload, ['displayOnlyProblems' => true]))->getData(true);
+        $problems = $this->callController(array_replace($payload, ['display_only_problems' => true]))->getData(true);
 
         self::assertSame(['data', 'meta'], array_keys($all));
         self::assertSame(2, $all['meta']['total']);

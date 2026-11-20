@@ -58,12 +58,12 @@
     "schemas": {
       "EmailValidationRequest": {
         "type": "object",
-        "required": ["textInput", "checkDNS", "checkSpoof", "displayOnlyProblems"],
+        "required": ["text_input", "check_dns", "check_spoof", "display_only_problems"],
         "properties": {
-          "textInput": {"type": "string", "minLength": 1},
-          "checkDNS": {"type": "boolean", "default": true},
-          "checkSpoof": {"type": "boolean", "default": true},
-          "displayOnlyProblems": {"type": "boolean", "default": true}
+          "text_input": {"type": "string", "minLength": 1},
+          "check_dns": {"type": "boolean", "default": true},
+          "check_spoof": {"type": "boolean", "default": true},
+          "display_only_problems": {"type": "boolean", "default": true}
         },
         "additionalProperties": false
       },
