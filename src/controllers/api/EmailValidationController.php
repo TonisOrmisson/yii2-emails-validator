@@ -105,6 +105,7 @@ final class EmailValidationController extends Controller
         $response->format = Response::FORMAT_JSON;
         $response->statusCode = 422;
         $response->data = [
+            'message' => EmailValidationApiResponder::INVALID,
             'errors' => [
                 'request' => ['The request body must be a valid JSON object.'],
             ],

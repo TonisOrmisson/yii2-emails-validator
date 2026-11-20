@@ -49,6 +49,7 @@ final class YiiMalformedJsonParserTest extends Unit
         );
         self::assertSame(422, $response->statusCode);
         self::assertSame([
+            'message' => 'The given data was invalid.',
             'errors' => [
                 'request' => ['The request body must be a valid JSON object.'],
             ],

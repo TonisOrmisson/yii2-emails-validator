@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- API v1: a 422 answers `{"message": "The given data was invalid.", "errors": {...}}`, the error shape of the other modules' APIs (was `{"errors"}` only; `errors` is unchanged), on Laravel and Yii (`EmailValidationApiResponder::INVALID`). The OpenAPI file lists the base paths as the other modules do (`servers`: `/api/v1` for Laravel, `/emailsvalidator/api/v1` for Yii; the path is `/email-validations`; URLs are unchanged) and names the operation `emailValidation.store` (was `validateEmailAddresses`).
+
 ## 2.3.0 - 2026-11-19
 
 - The ability name is a stable public contract: new `Abilities::ACCESS` (`access::emailsValidator`), never renamed; a host maps its own roles to it through its RBAC or Gate. The Yii `accessPermissionName` default and `EmailsValidatorPlugin::ACCESS_PERMISSION` are this constant; nothing changes in what is checked.

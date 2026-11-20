@@ -248,6 +248,7 @@ final class YiiEmailValidationApiTest extends Unit
 
         self::assertSame(422, $response->statusCode);
         self::assertSame([
+            'message' => 'The given data was invalid.',
             'errors' => [
                 'request' => ['The request body must be a valid JSON object.'],
             ],
@@ -264,6 +265,7 @@ final class YiiEmailValidationApiTest extends Unit
 
             self::assertSame(422, $response->statusCode);
             self::assertSame([
+                'message' => 'The given data was invalid.',
                 'errors' => [
                     'request' => ['The request body must be a valid JSON object.'],
                 ],
@@ -422,6 +424,7 @@ final class YiiEmailValidationApiTest extends Unit
         self::assertSame(1, $parserCalls);
         self::assertSame(422, \Yii::$app->response->statusCode);
         self::assertSame([
+            'message' => 'The given data was invalid.',
             'errors' => [
                 'request' => ['The request body must be a valid JSON object.'],
             ],

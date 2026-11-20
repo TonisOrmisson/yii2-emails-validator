@@ -10,6 +10,9 @@ use andmemasin\emailsvalidator\validation\EmailValidationResult;
 
 final class EmailValidationApiResponder
 {
+    /** The `message` of every 422, as the other modules' APIs answer `{message, errors}`. */
+    public const INVALID = 'The given data was invalid.';
+
     /** @return array{status: int, body: array<string, mixed>} */
     public function success(EmailValidationReport $report, bool $displayOnlyProblems): array
     {
@@ -28,10 +31,10 @@ final class EmailValidationApiResponder
         ];
     }
 
-    /** @return array{status: int, body: array{errors: array<string, list<string>>}} */
+    /** @return array{status: int, body: array{message: string, errors: array<string, list<string>>}} */
     public function error(EmailValidationException $exception): array
     {
-        return ['status' => 422, 'body' => ['errors' => $exception->errors()]];
+        return ['status' => 422, 'body' => ['message' => self::INVALID, 'errors' => $exception->errors()]];
     }
 
     /** @return array<string, bool|string> */

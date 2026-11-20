@@ -145,6 +145,7 @@ final class LaravelEmailValidationApiTest extends Unit
 
         self::assertSame(422, $response->getStatusCode());
         self::assertSame([
+            'message' => 'The given data was invalid.',
             'errors' => [
                 'request' => ['The request body must be a valid JSON object.'],
             ],
@@ -157,6 +158,7 @@ final class LaravelEmailValidationApiTest extends Unit
 
         self::assertSame(422, $response->getStatusCode());
         self::assertSame([
+            'message' => 'The given data was invalid.',
             'errors' => [
                 'request' => ['The request body must be a valid JSON object.'],
             ],

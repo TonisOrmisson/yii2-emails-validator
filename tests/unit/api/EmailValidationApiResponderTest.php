@@ -53,7 +53,7 @@ final class EmailValidationApiResponderTest extends Unit
         $response = (new EmailValidationApiResponder())->error($exception);
 
         self::assertSame(422, $response['status']);
-        self::assertSame(['errors' => [
+        self::assertSame(['message' => 'The given data was invalid.', 'errors' => [
             'textInput' => ['The e-mail input is required.'],
         ]], $response['body']);
         self::assertStringNotContainsString('Exception', json_encode($response));

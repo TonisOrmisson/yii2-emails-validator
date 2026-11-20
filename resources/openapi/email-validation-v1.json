@@ -6,13 +6,13 @@
     "description": "Stateless e-mail address validation. The host application configures the maximum input size; the default is 128 KB (128 KiB)."
   },
   "servers": [
-    {"url": "/"},
-    {"url": "/emailsvalidator"}
+    {"url": "/api/v1", "description": "Laravel adapter (EmailValidationServiceProvider)"},
+    {"url": "/emailsvalidator/api/v1", "description": "Yii adapter with the default emailsvalidator module ID"}
   ],
   "paths": {
-    "/api/v1/email-validations": {
+    "/email-validations": {
       "post": {
-        "operationId": "validateEmailAddresses",
+        "operationId": "emailValidation.store",
         "security": [{"cookieAuth": []}],
         "parameters": [
           {
@@ -101,8 +101,9 @@
       },
       "EmailValidationErrorResponse": {
         "type": "object",
-        "required": ["errors"],
+        "required": ["message", "errors"],
         "properties": {
+          "message": {"type": "string", "const": "The given data was invalid."},
           "errors": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}}
         },
         "additionalProperties": false

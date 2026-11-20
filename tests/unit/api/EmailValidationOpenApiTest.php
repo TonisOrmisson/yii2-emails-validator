@@ -15,19 +15,13 @@ final class EmailValidationOpenApiTest extends Unit
 
         $document = json_decode((string) file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
         self::assertSame('3.1.0', $document['openapi']);
-        $servers = array_column($document['servers'] ?? [], 'url');
-        self::assertContains('/', $servers);
-        self::assertContains('/emailsvalidator', $servers);
-        $serverRoutes = array_map(
-            static fn (string $server): string => rtrim($server, '/') . '/api/v1/email-validations',
-            $servers,
-        );
-        self::assertContains('/api/v1/email-validations', $serverRoutes);
-        self::assertContains('/emailsvalidator/api/v1/email-validations', $serverRoutes);
-        self::assertArrayHasKey('/api/v1/email-validations', $document['paths']);
+        // the base paths as the other modules' OpenAPI files: Laravel first, then the Yii module path
+        self::assertSame(['/api/v1', '/emailsvalidator/api/v1'], array_column($document['servers'] ?? [], 'url'));
+        self::assertArrayHasKey('/email-validations', $document['paths']);
         self::assertCount(1, $document['paths']);
 
-        $operation = $document['paths']['/api/v1/email-validations'];
+        $operation = $document['paths']['/email-validations'];
+        self::assertSame('emailValidation.store', $operation['post']['operationId']);
         self::assertSame(['post'], array_keys($operation));
         self::assertArrayHasKey('security', $operation['post']);
         self::assertSame([['cookieAuth' => []]], $operation['post']['security']);
