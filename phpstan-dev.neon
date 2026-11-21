@@ -1,16 +1,4 @@
+# The dev shell's analysis from its root, on the root vendor (every module is on its autoloader):
+#   docker compose exec php php vendor/bin/phpstan analyze -c modules/andmemasin/emailsvalidator/phpstan-dev.neon
 includes:
     - phpstan.neon
-parameters:
-    scanDirectories:
-        - ../actionlog/src
-        - ../collector/src
-        - ../emailsvalidator/src
-        - ../helpers/src
-        - ../inviter/src
-        - ../language/src
-        - ../myabstract/src
-        - ../survey/src
-        - ../surveyapp/src
-        - ../weights/src
-        - ../../../widgets/yii2-querybuilder/src
-        - ../../../widgets/yii2-json-form/src
