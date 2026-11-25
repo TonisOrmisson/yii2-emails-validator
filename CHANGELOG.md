@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.1 - 2026-11-25
+
+- Composer dist archives leave out tests, docs and development tool and CI configuration (`.gitattributes` `export-ignore`); nothing the module needs at runtime changes.
+
 ## 2.4.0 - 2026-11-20
 
 - API v1 (breaking): the request body names are snake_case as in every other v1 API: `text_input`, `check_dns`, `check_spoof`, `display_only_problems` (were `textInput`, `checkDNS`, `checkSpoof`, `displayOnlyProblems`); a 422 names the fields the same way (`errors.text_input`). `EmailValidationRequest::fromArray()` reads the new names, `EmailValidationService` reports `text_input`; the Yii form keeps its `textInput` field (`SiteController` maps the error). The `<emails-validator>` component sends the new names; OpenAPI updated.
